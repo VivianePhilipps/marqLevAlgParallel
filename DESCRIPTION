@@ -1,0 +1,19 @@
+Package: marqLevAlgParallel
+Type: Package
+Title: An parallelized algorithm for least-squares curve fitting
+Version: 1.0
+Date: 2018-10-18
+Author: Viviane Philipps, Cecile Proust-Lima, Boris Hejblum
+Depends: R (>= 2.0.0)
+LazyLoad: yes
+Description: This algorithm provides a numerical solution to the
+        problem of maximizing a function. This is more efficient than
+        the Gauss-Newton-like algorithm when starting from points very
+        far from the final maximum. A new convergence test is
+        implemented (RDM) in addition to the usual stopping criterion :
+        stopping rule is when the gradients are small enough in the
+        parameters metric (GH-1G).
+License: GPL (>= 2.0)
+NeedsCompilation: yes
+Imports: doParallel, foreach
+RoxygenNote: 6.0.1
