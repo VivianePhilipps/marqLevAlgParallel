@@ -2,7 +2,7 @@
 # A derivate function 
 #
 #' @export
-deriva <- function(nproc=1,b,funcpa,...){
+deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
 
     m <- length(b)
     bh2 <- bh <- rep(0,m)
@@ -22,7 +22,8 @@ deriva <- function(nproc=1,b,funcpa,...){
             ## derivees premieres:
             ll <- foreach(k=(m*(m+1)/2)+1:m,
                           .combine=cbind,
-                          .export=c("grid","b","h","funcpa")) %dopar%
+                          .export=c("grid","b","h","funcpa"),
+                          .packages=.packages) %dopar%
             {
                 i <- grid[k,1]
                 
@@ -45,7 +46,8 @@ deriva <- function(nproc=1,b,funcpa,...){
             ## derivees secondes:
             v2 <- foreach(k=1:(m*(m+1)/2),
                           .combine=c,
-                          .export=c("grid","b","h","funcpa","rl","fcith")) %dopar%
+                          .export=c("grid","b","h","funcpa","rl","fcith"),
+                          .packages=.packages) %dopar%
             {
                 i <- grid[k,1]
                 j <- grid[k,2]

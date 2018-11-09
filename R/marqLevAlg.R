@@ -48,6 +48,7 @@
 #' changing the starting point of the algorithm. Default value is 25.
 #' @param nproc number of processors for parallel computing
 #' @param clustertype one of the supported types from \code{\link[parallel]{makeCluster}}
+#' @param .packages for parallel setting only, packages used in the fn function
 #' @param \dots other arguments of the fn function 
 #'
 #' @return \item{cl}{ summary of the call to the function marqLevAlg.  }
@@ -114,7 +115,7 @@
 #'
 
 
-marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",...){
+marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages,...){
 	cl <- match.call()
 	if (missing(m) & missing(b)) stop("The 'marqLevAlg' alogorithm needs a vector of parameters 'b' or his length 'm'")
 	if(missing(m)) m <- length(b)	
@@ -203,7 +204,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		res.out.error <- list("old.b"=round(old.b,digits),"old.rl"=round(old.rl,digits),"old.ca"=round(old.ca,digits),"old.cb"=round(old.cb,digits),"old.dd"=round(old.dd,digits))
 	
 		if(is.null(gr)){ 
-			deriv <- deriva(nproc,b,funcpa,...)
+			deriv <- deriva(nproc,b,funcpa,.packages=.packages,...)
 			v <- deriv$v
 			rl <- deriv$rl
 			
@@ -212,7 +213,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 				while(((kk < multipleTry) & (!is.finite(rl)))){
 					kk <- kk + 1
 					b <- b/2
-					deriv <- deriva(nproc,b,funcpa,...)
+					deriv <- deriva(nproc,b,funcpa,.packages=.packages,...)
 					v <- deriv$v
 					rl <- deriv$rl
 				}

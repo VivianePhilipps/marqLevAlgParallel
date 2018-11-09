@@ -7,7 +7,7 @@
 marqLevAlg(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
   epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
   print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", ...)
+  clustertype = NULL, file = "", .packages, ...)
 }
 \arguments{
 \item{b}{an optional vector containing the initial values for the
@@ -53,6 +53,8 @@ changing the starting point of the algorithm. Default value is 25.}
 \item{nproc}{number of processors for parallel computing}
 
 \item{clustertype}{one of the supported types from \code{\link[parallel]{makeCluster}}}
+
+\item{.packages}{for parallel setting only, packages used in the fn function}
 
 \item{\dots}{other arguments of the fn function}
 }
