@@ -191,7 +191,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 	
 		if (sum(!is.finite(b))>0){
 
-			cat("Probably too much accuracy requested...\n",)
+			cat("Probably too much accuracy requested...\n")
 			cat("Last step values :\n")
 			cat("      b :",round(old.b,digits),"\n")
 			cat("      likelihood :",round(-old.rl,digits),"\n")
