@@ -7,7 +7,7 @@
 marqLevAlg(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
   epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
   print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", .packages, ...)
+  clustertype = NULL, file = "", .packages = NULL, ...)
 }
 \arguments{
 \item{b}{an optional vector containing the initial values for the
