@@ -21,9 +21,13 @@
 #' parameters. Default is 0.1 for every parameter.
 #' @param m an optional parameter if the vector of parameter is not missing
 #' compulsory if b is not given.
-#' @param fn The function to be maximized, with argument the
-#' vector of parameters over which maximization is to take place.  It should
+#' @param fn The function to be optimized, with argument the
+#' vector of parameters over which optimization is to take place.  It should
 #' return a scalar result.
+#' @param gr a function to return the gradient value for a specific point.
+#' If missing, finite-difference approximation will be used.
+#' @param hess a function to return the hessian matrix for a specific point.
+#' If missing, finite-difference approximation will be used.
 #' @param maxiter optional maximum number of iterations for the marqLevAlg
 #' iterative algorithm. Default is 500.
 #' @param epsa optional threshold for the convergence criterion based on the
@@ -48,7 +52,10 @@
 #' changing the starting point of the algorithm. Default value is 25.
 #' @param nproc number of processors for parallel computing
 #' @param clustertype one of the supported types from \code{\link[parallel]{makeCluster}}
+#' @param file optional character giving the name of the file where the outputs
+#' of each iteration should be written (if print.info=TRUE).
 #' @param .packages for parallel setting only, packages used in the fn function
+#' @param minimize logical indicating if the fn function should be minimized or maximized. By default minimize=TRUE, the function is minimized.
 #' @param \dots other arguments of the fn function 
 #'
 #' @return \item{cl}{ summary of the call to the function marqLevAlg.  }
@@ -57,19 +64,20 @@
 #' criteria were satisfied, =2 if the maximum number of iterations was reached,
 #' =4 if the algorithm encountered a problem in the function computation.  }
 #' \item{v}{ vector containing the upper triangle matrix of variance-covariance
-#' estimates at the stopping point.  } \item{fn.value}{ function evaluation at
+#' estimates at the stopping point.  } \item{grad}{vector containing the gradient
+#' at the stopping point.} \item{fn.value}{ function evaluation at
 #' the stopping point.  } \item{b}{ stopping point value.  } \item{ca}{
 #' convergence criteria for parameters stabilisation.  } \item{cb}{ convergence
 #' criteria for function stabilisation.  } \item{rdm}{ convergence criteria on
-#' the relative distance to minimum.  } \item{time}{ a running time.  }
-#' @author Viviane Philipps, Cecile Proust-Lima, Boris Hejblum
+#' the relative distance to minimum (or maximum).  } \item{time}{ a running time.  }
+#' @author Melanie Prague, Viviane Philipps, Cecile Proust-Lima, Boris Hejblum, Daniel Commenges, Amadou Diakite
 #' @references \emph{marqLevAlg Algorithm}
 #'
 #' Donald W. marquardt An algorithm for Least-Squares Estimation of Nonlinear
 #' Parameters. Journal of the Society for Industrial and Applied Mathematics,
 #' Vol. 11, No. 2. (Jun, 1963), pp. 431-441.
 #'
-#' \emph{Convergence criteria : Relative distance to Minimim}
+#' \emph{Convergence criteria : Relative distance to Minimim (or Maximum)}
 #'
 #' Commenges D. Jacqmin-Gadda H. Proust C. Guedj J. A Newton-like algorithm for
 #' likelihood maximization the robust-variance scoring algorithm
@@ -90,8 +98,8 @@
 #' ## Call
 #' test1 <- marqLevAlg(b=b,fn=f1)
 #'
-#'microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f1),
-#'                               marqLevAlg(b=b,fn=f1,nproc = 3)
+#'microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f1,minimize=FALSE),
+#'                               marqLevAlg(b=b,fn=f1,minimize=FALSE,nproc = 3)
 #'                               )
 #'
 #'
@@ -115,7 +123,7 @@
 #'
 
 
-marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,...){
+marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=FALSE,...){
 	cl <- match.call()
 	if (missing(m) & missing(b)) stop("The 'marqLevAlg' alogorithm needs a vector of parameters 'b' or his length 'm'")
 	if(missing(m)) m <- length(b)	
@@ -133,23 +141,26 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 	if(missing(fn)) stop("The argument 'funcpa' is missing.")
 
         
-        if(nproc>1)
-            {
-                if(is.null(clustertype))
-                {
-                    clustpar <- parallel::makeCluster(nproc)
-                }
-                else
-                {
-                    clustpar <- parallel::makeCluster(nproc, type=clustertype)
-                }
-                
-                doParallel::registerDoParallel(clustpar)
+        if(nproc>1){
+            if(is.null(clustertype)){
+                clustpar <- parallel::makeCluster(nproc, outfile="")
             }
+            else{
+                clustpar <- parallel::makeCluster(nproc, type=clustertype, outfile="")
+            }
+            
+            doParallel::registerDoParallel(clustpar)
+        }
 
 
-	funcpa <- function(b,...){fn(b,...)} #modif -fn en fn
-	if(!is.null(gr)) grad <- function(b,...){gr(b,...)}
+        if(minimize==TRUE){
+             funcpa <- function(b,...){-fn(b,...)} 
+            if(!is.null(gr)) grad <- function(b,...){-gr(b,...)}            
+        }
+        else{
+            funcpa <- function(b,...){fn(b,...)} 
+            if(!is.null(gr)) grad <- function(b,...){gr(b,...)}
+        }
 	if(!is.null(hess)) hessian <- function(b,...){hess(b,...)}
 
 	flush.console()
@@ -223,10 +234,10 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 			rl=funcpa(b,...)
 			
 			if(is.null(hess)){
-				deriv <- deriva_grad(b,grad,...)
+				deriv <- deriva_grad(nproc=nproc,b,grad,.packages=.packages,...)
 				v <- c(v,deriv$hessian,grad(b,...))
 			}else{
-				tmp.hessian <- hessian(b) 
+				tmp.hessian <- hessian(b,...) 
 				if(is.matrix(tmp.hessian)){
 					tmp.hessian <- tmp.hessian[upper.tri(tmp.hessian,diag=T)]
 				}
@@ -237,8 +248,8 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		if((sum(is.finite(b))==m) && !is.finite(rl)){
 			cat("Problem of computation. Verify your function specification...\n")
 			cat("Infinite likelihood with finite parameters : b=",round(old.b,digits),"\n")
-			cat("      - Check the computation and the continuity,\n")
-			cat("      - Check that you minimize the function.\n")
+		##	cat("      - Check the computation and the continuity,\n")
+		##  	cat("      - Check that you minimize the function.\n")
 			stop("")
 		
 		}
@@ -431,24 +442,25 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 
 	}
         
-        if(nproc>1)
-        {
+        if(nproc>1){
             parallel::stopCluster(clustpar)
         }
-
         
+        if(minimize==TRUE) rl <- -rl
 	if((istop %in% 2:4)==F) istop <- 1
 	cost <- proc.time() - ptm
-	result <- list(cl=cl,ni=ni,ier=ier,istop=istop,v=fu[1:(m*(m+1)/2)],fn.value=rl,b=b,ca=ca,cb=cb,rdm=dd,time=round(cost[3],3)) 
+
+        result <- list(cl=cl,ni=ni,ier=ier,istop=istop,v=fu[1:(m*(m+1)/2)],
+                       grad=v[(m*(m+1)/2)+1:m],fn.value=rl,b=b,
+                       ca=ca,cb=cb,rdm=dd,time=round(cost[3],3))
 	class(result) <- "marqLevAlg"
-        if(print.info==TRUE)
-            {
-                if(file!="")
-                    {
-                        fileres <- sub(".txt","_last.txt",file)
-                        dput(result,file=fileres)
-                    }
+        
+        if(print.info==TRUE){
+            if(file!=""){
+                fileres <- sub(".txt","_last.txt",file)
+                dput(result,file=fileres)
             }
+        }
 	
 
 	return(result)
@@ -458,6 +470,9 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 
 
 
+#' @rdname marqLevAlg
+#' @export
+mla <- marqLevAlg
 
 
 

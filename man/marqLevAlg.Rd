@@ -2,12 +2,20 @@
 % Please edit documentation in R/marqLevAlg.R
 \name{marqLevAlg}
 \alias{marqLevAlg}
+\alias{mla}
 \title{An algorithm for least-squares curve fitting.}
 \usage{
 marqLevAlg(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
   epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
   print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", .packages = NULL, ...)
+  clustertype = NULL, file = "", .packages = NULL, minimize = FALSE,
+  ...)
+
+mla(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
+  epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
+  print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
+  clustertype = NULL, file = "", .packages = NULL, minimize = FALSE,
+  ...)
 }
 \arguments{
 \item{b}{an optional vector containing the initial values for the
@@ -16,9 +24,15 @@ parameters. Default is 0.1 for every parameter.}
 \item{m}{an optional parameter if the vector of parameter is not missing
 compulsory if b is not given.}
 
-\item{fn}{The function to be maximized, with argument the
-vector of parameters over which maximization is to take place.  It should
+\item{fn}{The function to be optimized, with argument the
+vector of parameters over which optimization is to take place.  It should
 return a scalar result.}
+
+\item{gr}{a function to return the gradient value for a specific point.
+If missing, finite-difference approximation will be used.}
+
+\item{hess}{a function to return the hessian matrix for a specific point.
+If missing, finite-difference approximation will be used.}
 
 \item{maxiter}{optional maximum number of iterations for the marqLevAlg
 iterative algorithm. Default is 500.}
@@ -54,7 +68,12 @@ changing the starting point of the algorithm. Default value is 25.}
 
 \item{clustertype}{one of the supported types from \code{\link[parallel]{makeCluster}}}
 
+\item{file}{optional character giving the name of the file where the outputs
+of each iteration should be written (if print.info=TRUE).}
+
 \item{.packages}{for parallel setting only, packages used in the fn function}
+
+\item{minimize}{logical indicating if the fn function should be minimized or maximized. By default minimize=TRUE, the function is minimized.}
 
 \item{\dots}{other arguments of the fn function}
 }
@@ -65,11 +84,12 @@ criterion.  } \item{istop}{ status of convergence: =1 if the convergence
 criteria were satisfied, =2 if the maximum number of iterations was reached,
 =4 if the algorithm encountered a problem in the function computation.  }
 \item{v}{ vector containing the upper triangle matrix of variance-covariance
-estimates at the stopping point.  } \item{fn.value}{ function evaluation at
+estimates at the stopping point.  } \item{grad}{vector containing the gradient
+at the stopping point.} \item{fn.value}{ function evaluation at
 the stopping point.  } \item{b}{ stopping point value.  } \item{ca}{
 convergence criteria for parameters stabilisation.  } \item{cb}{ convergence
 criteria for function stabilisation.  } \item{rdm}{ convergence criteria on
-the relative distance to minimum.  } \item{time}{ a running time.  }
+the relative distance to minimum (or maximum).  } \item{time}{ a running time.  }
 }
 \description{
 This algorithm provides a numerical solution to the problem of maximizing a
@@ -103,8 +123,8 @@ f1 <- function(b){
 ## Call
 test1 <- marqLevAlg(b=b,fn=f1)
 
-microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f1),
-                              marqLevAlg(b=b,fn=f1,nproc = 3)
+microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f1,minimize=FALSE),
+                              marqLevAlg(b=b,fn=f1,minimize=FALSE,nproc = 3)
                               )
 
 
@@ -134,12 +154,12 @@ Donald W. marquardt An algorithm for Least-Squares Estimation of Nonlinear
 Parameters. Journal of the Society for Industrial and Applied Mathematics,
 Vol. 11, No. 2. (Jun, 1963), pp. 431-441.
 
-\emph{Convergence criteria : Relative distance to Minimim}
+\emph{Convergence criteria : Relative distance to Minimim (or Maximum)}
 
 Commenges D. Jacqmin-Gadda H. Proust C. Guedj J. A Newton-like algorithm for
 likelihood maximization the robust-variance scoring algorithm
 arxiv:math/0610402v2 (2006)
 }
 \author{
-Viviane Philipps, Cecile Proust-Lima, Boris Hejblum
+Melanie Prague, Viviane Philipps, Cecile Proust-Lima, Boris Hejblum, Daniel Commenges, Amadou Diakite
 }

@@ -1,9 +1,10 @@
 Package: marqLevAlgParallel
 Type: Package
 Title: An parallelized algorithm for least-squares curve fitting
-Version: 1.0
-Date: 2018-10-18
-Author: Viviane Philipps, Cecile Proust-Lima, Boris Hejblum
+Version: 2.0
+Date: 2019-03-22
+Author: Melanie Prague, Viviane Philipps, Cecile Proust-Lima, Boris Hejblum, Daniel Commenges, Amadou Diakite
+Maintainer: Viviane Philipps <viviane.philipps@u-bordeaux.fr>
 Depends: R (>= 2.0.0)
 LazyLoad: yes
 Description: This algorithm provides a numerical solution to the
