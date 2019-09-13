@@ -35,5 +35,9 @@
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
+#' @importFrom stats pchisq
+#' @importFrom stats qnorm
+#' @importFrom utils flush.console
+#' @importFrom utils write.table
 #' @useDynLib marqLevAlgParallel
 NULL
