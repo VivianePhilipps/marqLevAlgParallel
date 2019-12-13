@@ -22,6 +22,6 @@ a dataset contains 936 rows and 5 columns.
 
 \examples{
 data(weib)
-## maybe str(weib) ; plot(weib) ...
+head(weib)
 }
 \keyword{datasets}

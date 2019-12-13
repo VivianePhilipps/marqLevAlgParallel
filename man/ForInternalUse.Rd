@@ -2,7 +2,6 @@
 \alias{searpas}
 \alias{valfpa}
 \alias{ghg}
-\alias{deriva_grad}
 \alias{sup}
 \alias{func1}
 \alias{func}

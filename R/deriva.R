@@ -1,7 +1,30 @@
-#
-# A derivate function 
-#
+#' Numerical derivatives
+#'
+#' The function computes the first derivates and the information score matrix.
+#' Central finite-differences and forward finite-differences are used for the first
+#' and second derivatives respectively.
+#'
+#' @param nproc number of processors for parallel computing
+#' @param b value of parameters to be optimized over
+#' @param funcpa function to be minimized (or maximized), with argument the vector
+#' of parameters over which minimization isto take place.
+#' It should return a scalar result.
+#' @param .packages character vector of packages that funcpa depends on
+#' @param \dots other arguments of the funcpa function
+#'
+#' @return \item{v}{vector containing the upper part of the information score
+#' matrix and the first derivatives} \item{rl}{the value of the funcpa function
+#' at point b}
+#' @author Viviane Philipps, Boris Hejblum, Cecile Proust-Lima, Daniel Commenges
+#' @references Donald W. Marquardt An algorithm for Least-Squares Estimation of Nonlinear Parameters. Journal of the Society for Industrial and Applied Mathematics, Vol. 11, No. 2. (Jun, 1963), pp. 431-441.
+#'
+#' @examples
+#' b <- 0.1
+#' f <- function(b){return((2*b[1]**2+3*b[1]))}
+#' d <- deriva(b=b,funcpa=f)
+#' 
 #' @export
+#' 
 deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
 
     m <- length(b)

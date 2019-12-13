@@ -1,6 +1,6 @@
 #' An algorithm for least-squares curve fitting.
 #'
-#' This algorithm provides a numerical solution to the problem of maximizing a
+#' This algorithm provides a numerical solution to the problem of optimizing a
 #' function. This is more efficient than the Gauss-Newton-like algorithm when
 #' starting from points very far from the final maximum. A new convergence test
 #' is implemented (RDM) in addition to the usual stopping criterion : stopping
@@ -19,11 +19,10 @@
 #'
 #' @param b an optional vector containing the initial values for the
 #' parameters. Default is 0.1 for every parameter.
-#' @param m an optional parameter if the vector of parameter is not missing
-#' compulsory if b is not given.
-#' @param fn The function to be optimized, with argument the
-#' vector of parameters over which optimization is to take place.  It should
-#' return a scalar result.
+#' @param m number of parameters. Optional if b is specified.
+#' @param fn the function to be optimized, with first argument the
+#' vector of parameters over which optimization is to take place (argument b).
+#' It should return a scalar result.
 #' @param gr a function to return the gradient value for a specific point.
 #' If missing, finite-difference approximation will be used.
 #' @param hess a function to return the hessian matrix for a specific point.
@@ -38,17 +37,16 @@
 #' criterion has the nice interpretation of estimating the ratio of the
 #' approximation error over the statistical error, thus it can be used for
 #' stopping the iterative process whathever the problem. Default is 0.01.
-#' @param digits Number of digits to print in outputs. Default value is 8.
-#' @param print.info Logical.Equals to TRUE if report (parameters at iteration,
-#' function value, convergence criterion ...) at each iteration is requested.
+#' @param digits number of digits to print in outputs. Default value is 8.
+#' @param print.info logical indicating if information about computation should be
+#' reported at each iteration.
 #' Default value is FALSE.
-#' @param blinding Logical. Equals to TRUE if the algorithm is allowed to go on
+#' @param blinding logical. Equals to TRUE if the algorithm is allowed to go on
 #' in case of an infinite or not definite value of function. Default value is
 #' FALSE.
-#' @param multipleTry Integer, different from 1 if the algorithm is allowed to
+#' @param multipleTry integer, different from 1 if the algorithm is allowed to
 #' go for the first iteration in case of an infinite or not definite value of
-#' gradients or hessian. This account for a starting point to far from the
-#' definition set. As many tries as requested in multipleTry will be done by
+#' gradients or hessian. As many tries as requested in multipleTry will be done by
 #' changing the starting point of the algorithm. Default value is 25.
 #' @param nproc number of processors for parallel computing
 #' @param clustertype one of the supported types from \code{\link[parallel]{makeCluster}}
@@ -56,7 +54,7 @@
 #' of each iteration should be written (if print.info=TRUE).
 #' @param .packages for parallel setting only, packages used in the fn function
 #' @param minimize logical indicating if the fn function should be minimized or maximized. By default minimize=TRUE, the function is minimized.
-#' @param \dots other arguments of the fn function 
+#' @param \dots other arguments of the fn, gr and hess functions 
 #'
 #' @return \item{cl}{ summary of the call to the function marqLevAlg.  }
 #' \item{ni}{ number of marqLevAlg iterations before reaching stopping
@@ -88,23 +86,31 @@
 #' @examples
 #'
 #'
-#' ### 1
+#' ### example 1
 #' ### initial values
 #' b <- c(8,9)
 #' ### your function
 #' f1 <- function(b){
 #' 	return(-4*(b[1]-5)^2-(b[2]-6)^2)
 #' }
+#' ### gradient
+#' g1 <- function(b){
+#'      return(c(-8*(b[1]-5),-2*(b[2]-6)))
+#' }
 #' ## Call
-#' test1 <- marqLevAlg(b=b,fn=f1)
+#' test1 <- mla(b=b, fn=f1, minimize=FALSE)
 #'
-#'microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f1,minimize=FALSE),
-#'                               marqLevAlg(b=b,fn=f1,minimize=FALSE,nproc = 3)
-#'                               )
+#' \dontrun{
+#'microbenchmark::microbenchmark(mla(b=b, fn=f1, minimize=FALSE),
+#'                               mla(b=b, fn=f1, minimize=FALSE, nproc=2),
+#'                               mla(b=b, fn=f1, gr=g1, minimize=FALSE),
+#'                               mla(b=b, fn=f1, gr=g1, minimize=FALSE, nproc=2),
+#'                               times=10)
+#'         }
 #'
 #'
 #'
-#' ### 2
+#' ### example 2
 #' ## initial values
 #' b <- c(3,-1,0,1)
 #' ## your function
@@ -112,20 +118,23 @@
 #' 	return(-((b[1]+10*b[2])^2+5*(b[3]-b[4])^2+(b[2]-2*b[3])^4+10*(b[1]-b[4])^4))
 #' }
 #' ## Call
-#' test2 <- marqLevAlg(b=b,fn=f2)
+#' test2 <- mla(b=b, fn=f2, minimize=FALSE)
 #' test2$b
 #'
-#' test2_par <- marqLevAlg(b=b,fn=f2, nproc = 2)
+#' test2_par <- mla(b=b, fn=f2, minimize=FALSE, nproc=2)
 #' test2_par$b
-#'microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f2),
-#'                               marqLevAlg(b=b,fn=f2, nproc = 3)
-#'                               )
+#' 
+#' \dontrun{
+#'microbenchmark::microbenchmark(mla(b=b, fn=f2, minimize=FALSE),
+#'                               mla(b=b, fn=f2, minimize=FALSE, nproc=2),
+#'                               times=10)
+#'         }
 #'
 
 
-marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=FALSE,...){
+marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
 	cl <- match.call()
-	if (missing(m) & missing(b)) stop("The 'marqLevAlg' alogorithm needs a vector of parameters 'b' or his length 'm'")
+	if (missing(m) & missing(b)) stop("The 'marqLevAlg' algorithm needs a vector of parameters 'b' or his length 'm'")
 	if(missing(m)) m <- length(b)	
 	if(missing(b)) b <- rep(0.1,m)
 	if(length(b) != m){
@@ -270,17 +279,16 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		}
 		fu.int <- fu[1:(m*(m+1)/2)]
 	
-		dsinv <- .Fortran("dsinv",fu.out=as.double(fu.int),as.integer(m),as.double(ep),ier=as.integer(0),det=as.double(0),PACKAGE="marqLevAlgParallel")
+		dsinv <- .Fortran(C_dsinv,fu.out=as.double(fu.int),as.integer(m),as.double(ep),ier=as.integer(0),det=as.double(0))
 				
 		ier <- dsinv$ier
 		fu[1:(m*(m+1)/2)] <- dsinv$fu.out
 		if (ier == -1){
 			dd <- epsd+1 
 			v_tmp <- v[(m*(m+1)/2+1):(m*(m+3)/2)]
-			#dd <- sum(v_tmp*v_tmp)
 		}else{
 			dd <- ghg(m,v,fu)$ghg/m
-                        if(is.na(dd)) dd <- epsd+1 ##??? changmt
+                        if(is.na(dd)) dd <- epsd+1
 		}
 		
         if(print.info){
@@ -288,11 +296,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		cat("Log_likelihood ",round(rl,digits),"\n",file=file,append=TRUE)
 		cat("Convergence criteria: parameters stability=", round(ca,digits), "\n",file=file,append=TRUE)
 		cat("                    : likelihood stability=", round(cb,digits), "\n",file=file,append=TRUE) 
-		## if (ier == -1){
-		## 	cat("                    : Matrix inversion for RDM failed \n",file=file,append=TRUE)	
-		## }else{
-		## 	cat("                    : Matrix inversion for RDM successful \n",file=file,append=TRUE)
-		## }
 		cat("                    : relative distance to maximum(RDM)=", round(dd,digits), "\n",file=file,append=TRUE)
 
 		nom.par <- paste("parameter",c(1:m),sep="")
@@ -310,7 +313,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		old.rl <- rl
 		old.ca <- ca
 		old.cb <- cb
-                #if(is.na(dd)) browser()
 		if(dd<=old.dd){old.dd <- dd}
 		if((ca < epsa) & (cb < epsb) & (dd < epsd)){break}
 
@@ -336,7 +338,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 			}
 		}
 			
-		dchole <- .Fortran("dchole",fu=as.double(fu),as.integer(m),as.integer(nql),idpos=as.integer(0),PACKAGE="marqLevAlgParallel")
+		dchole <- .Fortran(C_dchole,fu=as.double(fu),as.integer(m),as.integer(nql),idpos=as.integer(0))
 		fu <- dchole$fu
 		idpos <- dchole$idpos
 
@@ -361,7 +363,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 				}
 			}
 			
-		dchole <- .Fortran("dchole",fu=as.double(fu),as.integer(m),as.integer(nql),idpos=as.integer(0),PACKAGE="marqLevAlgParallel")
+		dchole <- .Fortran(C_dchole,fu=as.double(fu),as.integer(m),as.integer(nql),idpos=as.integer(0))
 		
 			idpos <- dchole$idpos
 			fu <- dchole$fu
@@ -381,8 +383,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 			}
 		}else{
 			if(is.na(rl)){
-				cat(" Probably wrong definition of function FN \n")
-				cat("      ->  invalid number (infinite or NA)\n")
+				cat(" Numerical problem by computing fn \n")
 				cat("          value of function is :",round(-rl,digits),"\n")
 				
 				istop <- 4

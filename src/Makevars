@@ -1,0 +1,12 @@
+PKG_LIBS = $(BLAS_LIBS) $(FLIBS)
+
+CSRC = init.c
+FSRC = dsinv.f90 dchole.f90 dmfsd.f90
+
+# Define order of compilation
+OBJECTS = $(CSRC:.c=.o) $(FSRC:.f90=.o) 
+
+$(SHLIB): $(OBJECTS)
+
+#Setup dependencies for parallel make
+dsinv.o: dmfsd.o

@@ -8,25 +8,22 @@
 marqLevAlg(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
   epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
   print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", .packages = NULL, minimize = FALSE,
-  ...)
+  clustertype = NULL, file = "", .packages = NULL, minimize = TRUE, ...)
 
 mla(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
   epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
   print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", .packages = NULL, minimize = FALSE,
-  ...)
+  clustertype = NULL, file = "", .packages = NULL, minimize = TRUE, ...)
 }
 \arguments{
 \item{b}{an optional vector containing the initial values for the
 parameters. Default is 0.1 for every parameter.}
 
-\item{m}{an optional parameter if the vector of parameter is not missing
-compulsory if b is not given.}
+\item{m}{number of parameters. Optional if b is specified.}
 
-\item{fn}{The function to be optimized, with argument the
-vector of parameters over which optimization is to take place.  It should
-return a scalar result.}
+\item{fn}{the function to be optimized, with first argument the
+vector of parameters over which optimization is to take place (argument b).
+It should return a scalar result.}
 
 \item{gr}{a function to return the gradient value for a specific point.
 If missing, finite-difference approximation will be used.}
@@ -48,20 +45,19 @@ criterion has the nice interpretation of estimating the ratio of the
 approximation error over the statistical error, thus it can be used for
 stopping the iterative process whathever the problem. Default is 0.01.}
 
-\item{digits}{Number of digits to print in outputs. Default value is 8.}
+\item{digits}{number of digits to print in outputs. Default value is 8.}
 
-\item{print.info}{Logical.Equals to TRUE if report (parameters at iteration,
-function value, convergence criterion ...) at each iteration is requested.
+\item{print.info}{logical indicating if information about computation should be
+reported at each iteration.
 Default value is FALSE.}
 
-\item{blinding}{Logical. Equals to TRUE if the algorithm is allowed to go on
+\item{blinding}{logical. Equals to TRUE if the algorithm is allowed to go on
 in case of an infinite or not definite value of function. Default value is
 FALSE.}
 
-\item{multipleTry}{Integer, different from 1 if the algorithm is allowed to
+\item{multipleTry}{integer, different from 1 if the algorithm is allowed to
 go for the first iteration in case of an infinite or not definite value of
-gradients or hessian. This account for a starting point to far from the
-definition set. As many tries as requested in multipleTry will be done by
+gradients or hessian. As many tries as requested in multipleTry will be done by
 changing the starting point of the algorithm. Default value is 25.}
 
 \item{nproc}{number of processors for parallel computing}
@@ -75,7 +71,7 @@ of each iteration should be written (if print.info=TRUE).}
 
 \item{minimize}{logical indicating if the fn function should be minimized or maximized. By default minimize=TRUE, the function is minimized.}
 
-\item{\dots}{other arguments of the fn function}
+\item{\dots}{other arguments of the fn, gr and hess functions}
 }
 \value{
 \item{cl}{ summary of the call to the function marqLevAlg.  }
@@ -92,7 +88,7 @@ criteria for function stabilisation.  } \item{rdm}{ convergence criteria on
 the relative distance to minimum (or maximum).  } \item{time}{ a running time.  }
 }
 \description{
-This algorithm provides a numerical solution to the problem of maximizing a
+This algorithm provides a numerical solution to the problem of optimizing a
 function. This is more efficient than the Gauss-Newton-like algorithm when
 starting from points very far from the final maximum. A new convergence test
 is implemented (RDM) in addition to the usual stopping criterion : stopping
@@ -113,23 +109,31 @@ iterations or less strict convergence tolerances.
 \examples{
 
 
-### 1
+### example 1
 ### initial values
 b <- c(8,9)
 ### your function
 f1 <- function(b){
 	return(-4*(b[1]-5)^2-(b[2]-6)^2)
 }
+### gradient
+g1 <- function(b){
+     return(c(-8*(b[1]-5),-2*(b[2]-6)))
+}
 ## Call
-test1 <- marqLevAlg(b=b,fn=f1)
+test1 <- mla(b=b, fn=f1, minimize=FALSE)
 
-microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f1,minimize=FALSE),
-                              marqLevAlg(b=b,fn=f1,minimize=FALSE,nproc = 3)
-                              )
+\dontrun{
+microbenchmark::microbenchmark(mla(b=b, fn=f1, minimize=FALSE),
+                              mla(b=b, fn=f1, minimize=FALSE, nproc=2),
+                              mla(b=b, fn=f1, gr=g1, minimize=FALSE),
+                              mla(b=b, fn=f1, gr=g1, minimize=FALSE, nproc=2),
+                              times=10)
+        }
 
 
 
-### 2
+### example 2
 ## initial values
 b <- c(3,-1,0,1)
 ## your function
@@ -137,14 +141,17 @@ f2 <- function(b){
 	return(-((b[1]+10*b[2])^2+5*(b[3]-b[4])^2+(b[2]-2*b[3])^4+10*(b[1]-b[4])^4))
 }
 ## Call
-test2 <- marqLevAlg(b=b,fn=f2)
+test2 <- mla(b=b, fn=f2, minimize=FALSE)
 test2$b
 
-test2_par <- marqLevAlg(b=b,fn=f2, nproc = 2)
+test2_par <- mla(b=b, fn=f2, minimize=FALSE, nproc=2)
 test2_par$b
-microbenchmark::microbenchmark(marqLevAlg(b=b,fn=f2),
-                              marqLevAlg(b=b,fn=f2, nproc = 3)
-                              )
+
+\dontrun{
+microbenchmark::microbenchmark(mla(b=b, fn=f2, minimize=FALSE),
+                              mla(b=b, fn=f2, minimize=FALSE, nproc=2),
+                              times=10)
+        }
 
 }
 \references{
