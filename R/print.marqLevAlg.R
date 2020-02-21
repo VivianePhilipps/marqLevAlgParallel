@@ -34,7 +34,7 @@ cat(" \n")
 cat("Number of iterations: ", x$ni, "\n")
 cat(" \n")
 cat("Convergence criteria: parameters stability=", round(x$ca[1],digits), "\n")
-cat("                    : likelihood stability=", round(x$cb,digits), "\n") 
+cat("                    : objective function stability=", round(x$cb,digits), "\n") 
 if (x$ier == -1){
 	cat("                    : Matrix inversion for RDM failed \n")	
 }else{
@@ -43,7 +43,7 @@ if (x$ier == -1){
 cat("                    : relative distance to maximum(RDM)=", round(x$rdm,digits), "\n")
 cat(" \n")
 cat("Goodness-of-fit statistics:", "\n")
-cat("      maximum log-likelihood:", round(x$fn.value,digits)," \n")
+cat("      optimized objective function:", round(x$fn.value,digits)," \n")
 cat(" \n")
 cat(" \n")
 cat(" \n")
