@@ -1,8 +1,8 @@
 Package: marqLevAlg
 Type: Package
-Title: A Parallelized General-Purpose Algorithm based on Marquardt-Levenberg Algorithm
+Title: A Parallelized General-Purpose Optimization based on Marquardt-Levenberg Algorithm
 Version: 2.0.2
-Date: 2020-02-20
+Date: 2020-03-26
 Author: Viviane Philipps, Cecile Proust-Lima, Melanie Prague, Boris Hejblum, Daniel Commenges, Amadou Diakite
 Maintainer: Viviane Philipps <viviane.philipps@u-bordeaux.fr>
 Depends: R (>= 2.0.0)

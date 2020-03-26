@@ -1,4 +1,4 @@
-#' An algorithm for least-squares curve fitting.
+#' A parallelized general-purpose optimization based on Marquardt-Levenberg algorithm
 #'
 #' This algorithm provides a numerical solution to the problem of optimizing a
 #' function. This is more efficient than the Gauss-Newton-like algorithm when
@@ -8,7 +8,7 @@
 #' (GH-1G).
 #'
 #' Convergence criteria are very strict as they are based on derivatives of the
-#' log-likelihood in addition to the parameter and log-likelihood stability. In
+#' objective function in addition to the parameter and objective function stability. In
 #' some cases, the program may not converge and reach the maximum number of
 #' iterations fixed at 500.  In this case, the user should check that parameter
 #' estimates at the last iteration are not on the boundaries of the parameter
@@ -32,7 +32,7 @@
 #' @param epsa optional threshold for the convergence criterion based on the
 #' parameter stability. Default is 0.001.
 #' @param epsb optional threshold for the convergence criterion based on the
-#' log-likelihood stability. Default is 0.001.
+#' objective function stability. Default is 0.001.
 #' @param epsd optional threshold for the relative distance to maximum. This
 #' criterion has the nice interpretation of estimating the ratio of the
 #' approximation error over the statistical error, thus it can be used for
@@ -214,9 +214,9 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 			cat("Probably too much accuracy requested...\n")
 			cat("Last step values :\n")
 			cat("      b :",round(old.b,digits),"\n")
-			cat("      likelihood :",round(-old.rl,digits),"\n")
+			cat("      objective function :",round(-old.rl,digits),"\n")
 			cat("      Convergence criteria: parameters stability=", round(old.ca,digits), "\n")
-			cat("                          : likelihood stability=", round(old.cb,digits), "\n") 
+			cat("                          : function stability=", round(old.cb,digits), "\n") 
 			cat("                          : best relative distance to maximum obtained (RDM)=", round(old.dd,digits), "\n")
 			stop("")
 			 
@@ -256,7 +256,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		}
 		if((sum(is.finite(b))==m) && !is.finite(rl)){
 			cat("Problem of computation. Verify your function specification...\n")
-			cat("Infinite likelihood with finite parameters : b=",round(old.b,digits),"\n")
+			cat("Infinite value with finite parameters : b=",round(old.b,digits),"\n")
 		##	cat("      - Check the computation and the continuity,\n")
 		##  	cat("      - Check that you minimize the function.\n")
 			stop("")
@@ -293,9 +293,9 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,eps
 		
         if(print.info){
 		cat("------------------ iteration ",ni,"------------------\n",file=file,append=TRUE)
-		cat("Log_likelihood ",round(rl,digits),"\n",file=file,append=TRUE)
+		cat("Function value ",round(rl,digits),"\n",file=file,append=TRUE)
 		cat("Convergence criteria: parameters stability=", round(ca,digits), "\n",file=file,append=TRUE)
-		cat("                    : likelihood stability=", round(cb,digits), "\n",file=file,append=TRUE) 
+		cat("                    : function stability=", round(cb,digits), "\n",file=file,append=TRUE) 
 		cat("                    : relative distance to maximum(RDM)=", round(dd,digits), "\n",file=file,append=TRUE)
 
 		nom.par <- paste("parameter",c(1:m),sep="")

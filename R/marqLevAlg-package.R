@@ -1,4 +1,4 @@
-#' A parallelized general-purpose algorithm based on Marquardt-Levenderg algorithm
+#' A parallelized general-purpose optimization based on Marquardt-Levenberg algorithm
 #'
 #' This algorithm provides a numerical solution to the problem of
 #' miniminzing/maximizing a function. This is more efficient than the

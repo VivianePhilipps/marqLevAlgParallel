@@ -18,9 +18,9 @@ searpas <- function(vw,step,b,delta,funcpa,res.out.error,...){
 		cat("Probably too much accuracy requested...\n")
 		cat("Last step values :\n")
 		cat("      b :",res.out.error$old.b,"\n")
-		cat("      likelihood :",res.out.error$old.rl,"\n")
+		cat("      function value :",res.out.error$old.rl,"\n")
 		cat("      Convergence criteria: parameters stability=", res.out.error$old.ca, "\n")
-		cat("                          : likelihood stability=", res.out.error$old.cb, "\n") 
+		cat("                          : function stability=", res.out.error$old.cb, "\n") 
 		cat("                          : best relative distance to maximum obtained (RDM)=", res.out.error$old.dd, "\n")
 		stop("")	
 	}
