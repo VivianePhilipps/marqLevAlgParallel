@@ -1,5 +1,6 @@
 #' @export
-summary.marqLevAlg <- function(x,digits=8,...){
+summary.marqLevAlg <- function(object,digits=8,...){
+    x <- object
     if (!inherits(x, "marqLevAlg")) stop("use only with \"marqLevAlg\" objects")
     
     
