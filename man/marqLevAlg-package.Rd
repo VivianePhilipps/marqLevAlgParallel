@@ -3,7 +3,7 @@
 \docType{package}
 \name{marqLevAlg-package}
 \alias{marqLevAlg-package}
-\title{A parallelized algorithm for least-squares curve fitting.}
+\title{A parallelized general-purpose algorithm based on Marquardt-Levenderg algorithm}
 \description{
 This algorithm provides a numerical solution to the problem of
 miniminzing/maximizing a function. This is more efficient than the

@@ -1,6 +1,6 @@
 Package: marqLevAlg
 Type: Package
-Title: A Parallelized Algorithm for Least-Squares Curve Fitting based on Levenberg-Marquardt algorithm
+Title: A Parallelized General-Purpose Algorithm based on Marquardt-Levenberg Algorithm
 Version: 2.0.2
 Date: 2020-02-20
 Author: Viviane Philipps, Cecile Proust-Lima, Melanie Prague, Boris Hejblum, Daniel Commenges, Amadou Diakite
