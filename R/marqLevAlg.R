@@ -130,7 +130,31 @@
 #'                               times=10)
 #'         }
 #'
-
+#'
+#'\dontrun{
+#'### example 3 : a linear mixed model
+#'## the log-likelihood is implemented in the loglikLMM function
+#'## the gradient is implemented in the gradLMM function
+#'
+#'## data
+#'Y <- dataEx$Y
+#'X <- as.matrix(cbind(1,dataEx[,c("t","X1","X3")],dataEx$t*dataEx$X1))
+#'ni <- as.numeric(table(dataEx$i))
+#'
+#'## initial values
+#'binit <- c(0,0,0,0,0,1,1)
+#'
+#'## estimation in sequential mode, with numeric derivatives
+#'estim <- marqLevAlg(b=binit, fn=loglikLMM, minimize=FALSE, X=X, Y=Y, ni=ni)
+#'## estimation in parallel mode, with numeric derivatives
+#'estim2 <- marqLevAlg(b=binit, fn=loglikLMM, minimize=FALSE, X=X, Y=Y, ni=ni, 
+#'nproc=2, clustertype="FORK")
+#'## estimation in sequential mode, with analytic gradient
+#'estim3 <- marqLevAlg(b=binit, fn=loglikLMM, gr=gradLMM, minimize=FALSE, X=X, Y=Y, ni=ni)
+#'## estimation in parallel mode, with analytic gradient
+#'estim4 <- marqLevAlg(b=binit, fn=loglikLMM, gr=gradLMM, minimize=FALSE, X=X, Y=Y, ni=ni, 
+#'nproc=2, clustertype="FORK")
+#'}
 
 marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
 	cl <- match.call()
