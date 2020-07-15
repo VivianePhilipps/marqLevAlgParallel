@@ -1,5 +1,5 @@
 #' @export
-summary.marqLevAlg <- function(object,digits=8,...){
+summary.marqLevAlg <- function(object,digits=8,loglik=FALSE,...){
     x <- object
     if (!inherits(x, "marqLevAlg")) stop("use only with \"marqLevAlg\" objects")
     
@@ -8,6 +8,10 @@ summary.marqLevAlg <- function(object,digits=8,...){
     cat("                   Robust marqLevAlg algorithm                   ", "\n")
     cat(" \n")
     cl <- x$cl
+    minimize <- TRUE
+    if(length(cl$minimize)){
+        if(cl$minimize==FALSE) minimize <- FALSE
+    }
     dput(cl)
     cat(" \n")
     cat("Iteration process:", "\n")
@@ -27,7 +31,12 @@ summary.marqLevAlg <- function(object,digits=8,...){
     }else{
         cat("                    : Matrix inversion for RDM successful \n")
     }
-    cat("                    : relative distance to maximum(RDM)=", round(x$rdm,digits), "\n")
+    if(minimize==TRUE){
+        cat("                    : relative distance to minimum(RDM)=", round(x$rdm,digits), "\n")
+    }else{
+        cat("                    : relative distance to maximum(RDM)=", round(x$rdm,digits), "\n")
+    }
+
     if(x$istop!=4&x$istop!=5) {
         cat(" \n")
         cat("Final parameter values:", "\n")
@@ -38,8 +47,12 @@ summary.marqLevAlg <- function(object,digits=8,...){
         z <- abs(qnorm((1 + .95)/2))
         binf <- x$b-1.96*se
         bsup <- x$b+1.96*se
-        
-        tmp <- data.frame("coef"=format(round(x$b,3)),"SE coef"=format(round(se,3)),"Wald"=format(wald,4),"P-value"=round(1 - pchisq(wald, 1),5),"binf"=round(binf,3),"bsup"=round(bsup,3))
+
+        if(loglik==FALSE){
+            tmp <- data.frame("coef"=format(round(x$b,3)),"SE coef"=format(round(se,3)))
+        }else{
+            tmp <- data.frame("coef"=format(round(x$b,3)),"SE coef"=format(round(se,3)),"Wald"=format(wald,4),"P-value"=round(1 - pchisq(wald, 1),5),"binf"=round(binf,3),"bsup"=round(bsup,3))
+        }
         print(tmp,row.names=F)
         cat(" \n")
     }
