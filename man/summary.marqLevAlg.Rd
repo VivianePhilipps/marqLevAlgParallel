@@ -9,7 +9,7 @@ A short summary of parameters estimates by marqLevAlg algorithm.
 }
 
 \usage{
-\method{summary}{marqLevAlg}(object, digits, \dots)
+\method{summary}{marqLevAlg}(object, digits, loglik=FALSE, \dots)
 }
 
 \arguments{
@@ -19,10 +19,21 @@ a marqLevAlg object.
   \item{digits}{
 Number of digits to print in outputs. Default value is 8.
 }
+  \item{loglik}{
+Logical indicating if the objective function is a log-likelihood. By
+  default, loglik=FALSE.
+}
   \item{\dots}{
 other unusued arguments.
 }
 }
+
+\value{A data frame containing as many rows as estimated parameters. If
+  loglik=FALSE, it includes one column containing the estimated
+  parameters values. If loglik=TRUE, it includes 6 columns : the
+  estimated parameters, their standard errors, the corresponding Wald
+  statistic, the associated p-value and the boundaries of the 95\% confidence
+  interval.}
 
 \seealso{
  \code{\link{marqLevAlg}}, 
@@ -30,7 +41,7 @@ other unusued arguments.
 }
   
 \author{
-D. Commenges - M. Prague - A. Diakite
+V. Philipps, C. Proust-Lima, B. Hejblum, D. Commenges, M. Prague, A. Diakite
 }
 
 \examples{

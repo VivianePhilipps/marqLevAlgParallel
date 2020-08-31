@@ -28,7 +28,7 @@ other unusued arguments.
 }
 
 \author{
-D. Commenges - M. Prague - A. Diakite
+V. Philipps, C. Proust-Lima, B. Hejblum, D. Commenges, M. Prague, A. Diakite
 }
 
 \examples{
