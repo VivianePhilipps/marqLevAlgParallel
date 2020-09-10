@@ -29,6 +29,10 @@ enough in the parameters metric (GH-1G).
 \references{
 \emph{marqLevAlg Algorithm}
 
+Philipps V. Hejblum B.P. Prague M. Commenge D. Proust-Lima C.
+Robust and Efficient Optimization Using a Marquardt-Levenberg Algorithm
+with R Package marqLevAlg
+
 Donald W. marquardt An algorithm for Least-Squares Estimation of Nonlinear
 Parameters. Journal of the Society for Industrial and Applied Mathematics,
 Vol. 11, No. 2. (Jun, 1963), pp. 431-441.
