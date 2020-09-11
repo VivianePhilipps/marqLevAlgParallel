@@ -39,7 +39,7 @@ preamble: >
   \usepackage[utf8]{inputenc}
 documentclass: jss
 classoption: nojss
-output: rticles::jss_article
+output: if(rmarkdown::pandoc_version()>= 2.2) rticles::jss_article else rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{MLA}
   %\VignetteEngine{knitr::rmarkdown}
@@ -147,7 +147,6 @@ In all cases, the parallelization is achieved using the \pkg{doParallel} and \pk
 
 ```{r, results='hide', echo=FALSE, include = FALSE}
 knitr::opts_chunk$set(cache = TRUE, comment = '', echo = TRUE)
-load("data_mla.RData")
 library("marqLevAlg")
 library("ggplot2")
 library("viridis")
@@ -193,12 +192,11 @@ summary(estim, loglik = TRUE)
 
 
 
-The exact same model can also be estimated in parallel mode using FORK implementation of parallelism (here with two cores): 
+The exact same model can also be estimated in parallel mode (here with two cores): 
 
 ```{r, warning=FALSE}
 estim2 <- marqLevAlg(b = binit, fn = loglikLMM, minimize = FALSE, 
-                     nproc = 2, clustertype = "FORK", 
-                     X = X, Y = Y, ni = ni)
+                     nproc = 2, X = X, Y = Y, ni = ni)
 ```
 
 It can also be estimated by using analytical gradients (provided in gradient function \code{gradLMM} with the same arguments as \code{loglikLMM}):
@@ -263,8 +261,27 @@ Below are given the five first rows of the three first subjects:
 
 
 ```{r, echo=FALSE}
-data_mla$class <- data_mla$classe
-data_mla[c(1:5, 22:26, 43:47), c("i", "class", "X1", "X2", "X3", "t", "Ycens", "tsurv", "event")]
+structure(list(i = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 
+3), class = c(2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3), X1 = c(0, 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), X2 = c(0.647220467290558, 
+0.647220467290558, 0.647220467290558, 0.647220467290558, 0.647220467290558, 
+0.395484594958106, 0.395484594958106, 0.395484594958106, 0.395484594958106, 
+0.395484594958106, 1.06608365829076, 1.06608365829076, 1.06608365829076, 
+1.06608365829076, 1.06608365829076), X3 = c(43.4292026597267, 
+43.4292026597267, 43.4292026597267, 43.4292026597267, 43.4292026597267, 
+43.4605985147139, 43.4605985147139, 43.4605985147139, 43.4605985147139, 
+43.4605985147139, 42.0805667757557, 42.0805667757557, 42.0805667757557, 
+42.0805667757557, 42.0805667757557), t = c(0, 1, 2, 3, 4, 0, 
+1, 2, 3, 4, 0, 1, 2, 3, 4), Ycens = c(61.1063246971846, 60.7698831687246, 
+58.7261691593818, 56.7601531082037, 54.0455763709346, 37.9530151094344, 
+34.4865956424182, 31.3967930421455, 27.8142715666862, NA, 51.6087691810814, 
+53.8067070658917, 51.118399417372, 50.6433122329987, 50.8787321079207
+), tsurv = c(20, 20, 20, 20, 20, 3.76314836600959, 3.76314836600959, 
+3.76314836600959, 3.76314836600959, 3.76314836600959, 15.3969576458208, 
+15.3969576458208, 15.3969576458208, 15.3969576458208, 15.3969576458208
+), event = c(0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)), row.names = c(1L, 
+2L, 3L, 4L, 5L, 22L, 23L, 24L, 25L, 26L, 43L, 44L, 45L, 46L, 
+47L), class = "data.frame")
 ```
 
 
@@ -485,91 +502,52 @@ Codes and dataset used in this section are available at \url{https://github.com/
 MLA runned on 3 cores and converged when the three criteria defined in section \ref{sec:criteria} were satisfied with tolerance 0.001, 0.001 and 0.01 for the parameters, the likelihood and the RDM, respectively. BFGS converged when the convergence criterion on the log-likelihood was satisfied with the square root of the tolerance of the machine ($\approx 10^{-8}$). The EM algorithm converged when stability on the parameters or on the log-likelihood was satisfied with tolerance 0.0001 and around $10^{-8}$ (i.e., the square root of the tolerance of the machine), respectively.
 
 
-```{r, echo=FALSE, results='hide', message = FALSE}
-library("JM")
-
-prothro$t0 <- as.numeric(prothro$time == 0)
-lmeFit <- lme(pro ~ treat * (time + t0), random = ~ time | id, data = prothro)
-survFit <- coxph(Surv(Time, death) ~ treat, data = prothros, x = TRUE)
-
-dFpro <- list(fixed = ~ 1 + treat, indFixed = c(3, 5), random = ~ 1, indRandom = 2)
-
-prothro$pro01 <- prothro$pro / 10
-lmeFit01 <- lme(pro01 ~ treat * (time + t0), random = ~ time | id, data = prothro)
-
-prothro$pro10 <- prothro$pro * 10
-lmeFit10 <- lme(pro10 ~ treat * (time + t0), random = ~ time | id, data = prothro)
-
-load("jm_pro.RData") 
-```
-
 ```{r prothro, results='asis', echo=FALSE, message = FALSE}
+resbis <- structure(list(association = c("value", "value", "value", "value", 
+"value", "value", "value", "value", "value", "slope", "slope", 
+"slope", "slope", "slope", "slope", "slope", "slope", "slope", 
+"both", "both", "both", "both", "both", "both", "both", "both", 
+"both"), algorithm = c("BFGS", "BFGS", "BFGS", "EM", "EM", "EM", 
+"MLA", "MLA", "MLA", "BFGS", "BFGS", "BFGS", "EM", "EM", "EM", 
+"MLA", "MLA", "MLA", "BFGS", "BFGS", "BFGS", "EM", "EM", "EM", 
+"MLA", "MLA", "MLA"), scaling = c("1", "0.1", "10", "1", "0.1", 
+"10", "1", "0.1", "10", "1", "0.1", "10", "1", "0.1", "10", "1", 
+"0.1", "10", "1", "0.1", "10", "1", "0.1", "10", "1", "0.1", 
+"10"), LogLik = c(-13958.552128322, -7123.83366523364, -20795.6100064946, 
+-13957.9100947483, -7123.64664242897, -20792.0165904447, -13957.6874738687, 
+-7123.61491786343, -20791.7600408212, -13961.410640618, -7127.15852472177, 
+-20814.9746430314, -13960.6949103499, -7126.61992438705, -20794.7771562731, 
+-13960.688478504, -7126.61592251244, -20794.7610340869, -13951.5986192875, 
+-7115.74930093756, -20799.3213382741, -13949.8221932589, -7115.36653280077, 
+-20784.5370063629, -13949.4174388403, -7115.34488283373, -20783.4899958775
+), scaledLogLik = c(-13958.552128322, -13957.90622124, -13961.5374504883, 
+-13957.9100947483, -13957.7191984353, -13957.9440344384, -13957.6874738687, 
+-13957.6874738698, -13957.6874848149, -13961.410640618, -13961.2310807281, 
+-13980.9020870251, -13960.6949103499, -13960.6924803934, -13960.7046002668, 
+-13960.688478504, -13960.6884785188, -13960.6884780806, -13951.5986192875, 
+-13949.8218569439, -13965.2487822678, -13949.8221932589, -13949.4390888071, 
+-13950.4644503565, -13949.4174388403, -13949.4174388401, -13949.4174398712
+), value = c(-3.73061827287826, -0.0141539186930607, -9.27594324673535, 
+-0.29330877747947, 0.140534649953885, -0.591117664733939, 0, 
+-0.000142338309824958, -0.00140558371611392, NA, NA, NA, NA, 
+NA, NA, NA, NA, NA, 15.9710405532139, 2.65507149201079, 40.3077266989259, 
+4.10228091592489, 1.68353683871255, 10.6659991378836, 0, -0.000170669856949751, 
+0.00419338230974572), slope = c(NA, NA, NA, NA, NA, NA, NA, NA, 
+NA, -1.84843620399159, -1.3696438283896, -13.9825813428088, 0.179854683531865, 
+0.0260101270184876, 0.0817324481422286, 0, 0.000565059170089405, 
+0.00258486458745339, -28.1732598640996, -4.62818306775129, -95.2646725814592, 
+-7.22395309527721, -3.66247190442162, -16.3091118268196, 0, 0.000488761569032907, 
+-0.00982741352301927), iterations = c(120, 490, 91, 66, 104, 
+62, 7, 5, 15, 251, 391, 444, 169, 208, 156, 10, 10, 14, 164, 
+502, 52, 159, 156, 142, 10, 10, 22), time = c(29.319, 117.203, 
+18.3049999999998, 57.641, 89.976, 61.098, 36.0789999999997, 26.7719999999999, 
+72.5709999999999, 52.4590000000001, 78.7809999999999, 86.6110000000003, 
+143.2, 156.799, 138.045, 46.0369999999998, 46.3680000000004, 
+63.634, 40.1879999999999, 133.824, 10.8450000000003, 179.708, 
+148.234, 197.16, 51.2360000000003, 53.3180000000002, 118.374)), row.names = c(1L, 
+2L, 3L, 19L, 20L, 21L, 10L, 11L, 12L, 4L, 5L, 6L, 22L, 23L, 24L, 
+13L, 14L, 15L, 7L, 8L, 9L, 25L, 26L, 27L, 16L, 17L, 18L), class = "data.frame")
 
-a <- expand.grid(c("", "01", "10"), c("val", "slo", "both"), "GH15", c("BFGS", "marq", "EM"), stringsAsFactors=FALSE)
-mod <- apply(a, 1, function(x) paste("jm_pro", paste(x, collapse = "_"), sep = ""))
-
-abis <- expand.grid(c("", "01", "10"), c("val"), "GH15", c("BFGS", "marq", "EM"), stringsAsFactors = FALSE)
-modbis <- apply(abis, 1, function(x) paste("jm_pro", paste(x, collapse = "_"), sep = ""))
-ater <- expand.grid(c("", "01", "10"), c("slo"), "GH15", c("BFGS", "marq", "EM"), stringsAsFactors = FALSE)
-modter <- apply(ater, 1, function(x) paste("jm_pro", paste(x, collapse = "_"), sep = ""))
-
-res <- matrix(NA, 27, 7)
-k <- 0
-for(m in mod)
-{
-  k <- k + 1
-  jm <- get(m)
-  
-  sc <- 1
-  if(length(grep("pro10", m))) sc <- 10
-  if(length(grep("pro01", m))) sc <- 0.1
-  
-  res[k, 1] <- jm$convergence
-  res[k, 2] <- jm$iters
-  res[k, 3] <- jm$logLik
-  res[k, 4] <- jm$logLik + nrow(prothro) * log(sc)
-  if(m %in% modbis) res[k, 7] <- NA
-  else res[k, 7] <- as.numeric(jm$coefficients$Dalpha)
-  if(m %in% modter) res[k, 6] <- NA
-  else  res[k, 6] <- as.numeric(jm$coefficients$alpha)
-  if(!is.null(jm$qNtime)) res[k, 5] <- jm$qNtime[3]
-  if(!is.null(jm$EMtime)) res[k, 5] <- jm$EMtime
-}
-
-colnames(res) <- c("convergence", "iterations", "LogLik", "scaledLogLik", "time", "alpha", "Dalpha")
-
-library("xtable")
-
-res2 <- data.frame(res, algorithm = 0, scaling = 0, association = 0, value = 0, slope = 0)
-
-res2$algorithm[c(1:9)] <- "BFGS"
-res2$algorithm[c(10:18)] <- "MLA"
-res2$algorithm[c(19:27)] <- "EM"
-res2$scaling[c(1, 4, 7, 10, 13, 16, 19, 22, 25)] <- "1"
-res2$scaling[c(2, 5, 8, 11, 14, 17, 20, 23, 26)] <- "0.1"
-res2$scaling[c(3, 6, 9, 12, 15, 18, 21, 24, 27)] <- "10"
-res2$association[c(1:3, 10:12, 19:21)] <- "value"
-res2$association[c(4:6, 13:15, 22:24)] <- "slope"
-res2$association[c(7:9, 16:18, 25:27)] <- "both"
-
-res2$alpha[c(2, 5, 8, 20, 23, 26, 11, 14, 17)] <- res2$alpha[c(2, 5, 8, 20, 23, 26, 11, 14, 17)] / 10
-res2$alpha[c(3, 6, 9, 21, 24, 27, 12, 15, 18)] <- res2$alpha[c(3, 6, 9, 21, 24, 27, 12, 15, 18)] * 10
-res2$Dalpha[c(2, 5, 8, 20, 23, 26, 11, 14, 17)] <- res2$Dalpha[c(2, 5, 8, 20, 23, 26, 11, 14, 17)] / 10
-res2$Dalpha[c(3, 6, 9, 21, 24, 27, 12, 15, 18)] <- res2$Dalpha[c(3, 6, 9, 21, 24, 27, 12, 15, 18)] * 10
-
-
-res2$value[c(1, 2, 3, 19, 20, 21, 10, 11, 12)] <- 100 * (res2$alpha[c(1, 2, 3, 19, 20, 21, 10, 11, 12)] - res2$alpha[10]) / res2$alpha[10]
-res2$slope[c(1, 2, 3, 19, 20, 21, 10, 11, 12)] <- 100 * (res2$Dalpha[c(1, 2, 3, 19, 20, 21, 10, 11, 12)] - res2$Dalpha[10]) / res2$Dalpha[10]
-
-res2$value[c(4, 5, 6, 22, 23, 24, 13, 14, 15)] <- 100 * (res2$alpha[c(4, 5, 6, 22, 23, 24, 13, 14, 15)] - res2$alpha[13]) / res2$alpha[13]
-res2$slope[c(4, 5, 6, 22, 23, 24, 13, 14, 15)] <- 100 * (res2$Dalpha[c(4, 5, 6, 22, 23, 24, 13, 14, 15)] - res2$Dalpha[13]) / res2$Dalpha[13]
-
-res2$value[c(7, 8, 9, 25, 26, 27, 16, 17, 18)] <- 100 * (res2$alpha[c(7, 8, 9, 25, 26, 27, 16, 17, 18)] - res2$alpha[16]) / res2$alpha[16]
-res2$slope[c(7, 8, 9, 25, 26, 27, 16, 17, 18)] <- 100 * (res2$Dalpha[c(7, 8, 9, 25, 26, 27, 16, 17, 18)] - res2$Dalpha[16]) / res2$Dalpha[16]
-
-resbis <- res2[c(1, 2, 3, 19, 20, 21, 10, 11, 12, 4, 5, 6, 22, 23, 24, 13, 14, 15, 7, 8, 9, 25, 26, 27, 16, 17, 18),
-              c("association", "algorithm", "scaling", "LogLik", "scaledLogLik", "value", "slope", "iterations", "time")]
-	      
 addtorow <- list()
 addtorow$pos <- list(-1, 0)
 addtorow$command <- c("\\hline  Nature of & Algorithm & Scaling & Rescaled log-& Variation of& Variation of& Number of & Time in\\\\",
