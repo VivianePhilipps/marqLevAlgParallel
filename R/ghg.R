@@ -1,4 +1,4 @@
-
+#' @noRd
 ghg <- function(m,v,fu){
 	ghg <- 0
 	inf <- NULL

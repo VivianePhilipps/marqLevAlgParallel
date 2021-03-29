@@ -1,4 +1,5 @@
-
+#' Line search
+#' @noRd
 
 searpas <- function(vw,step,b,delta,funcpa,res.out.error,...){
     #cat("dans searpas, b=",b,"\n")

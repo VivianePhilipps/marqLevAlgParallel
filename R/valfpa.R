@@ -1,3 +1,4 @@
+#' @noRd
 valfpa <- function(vw,b,delta,funcpa,...){
     if(is.na(vw)) return(-2E9)
 	bk <- b + (exp(vw)*delta)

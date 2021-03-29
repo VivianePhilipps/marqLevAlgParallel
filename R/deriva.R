@@ -45,7 +45,6 @@ deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
             ## derivees premieres:
             ll <- foreach(k=(m*(m+1)/2)+1:m,
                           .combine=cbind,
-                          .export=c("grid","b","h","funcpa"),
                           .packages=.packages) %dopar%
             {
                 i <- grid[k,1]
@@ -69,7 +68,6 @@ deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
             ## derivees secondes:
             v2 <- foreach(k=1:(m*(m+1)/2),
                           .combine=c,
-                          .export=c("grid","b","h","funcpa","rl","fcith"),
                           .packages=.packages) %dopar%
             {
                 i <- grid[k,1]

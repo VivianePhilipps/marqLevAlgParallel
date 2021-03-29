@@ -23,7 +23,6 @@ deriva_grad <- function(nproc=1,b,grad,.packages=NULL,...){
         ## derivees du gradient
         vtmp <- foreach(j=1:m,
                         .combine=rbind,
-                        .export=c("b","h","grad"),
                         .packages=.packages) %dopar%
             {
                 k <- j

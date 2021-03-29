@@ -1,3 +1,4 @@
+#' @noRd
 func1 <- function(b,rl1,rl,delta,ni,maxiter)
 {
 	cb <- abs(rl1-rl)

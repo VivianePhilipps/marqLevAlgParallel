@@ -1,3 +1,4 @@
+#' @noRd
 sup <- function(m){
 	indice<-NULL 
 	for(i in 1:m){
