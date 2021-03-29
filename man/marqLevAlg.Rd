@@ -5,15 +5,49 @@
 \alias{mla}
 \title{A parallelized general-purpose optimization based on Marquardt-Levenberg algorithm}
 \usage{
-marqLevAlg(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
-  epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
-  print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", .packages = NULL, minimize = TRUE, ...)
+marqLevAlg(
+  b,
+  m = FALSE,
+  fn,
+  gr = NULL,
+  hess = NULL,
+  maxiter = 500,
+  epsa = 1e-04,
+  epsb = 1e-04,
+  epsd = 1e-04,
+  digits = 8,
+  print.info = FALSE,
+  blinding = TRUE,
+  multipleTry = 25,
+  nproc = 1,
+  clustertype = NULL,
+  file = "",
+  .packages = NULL,
+  minimize = TRUE,
+  ...
+)
 
-mla(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
-  epsa = 0.001, epsb = 0.001, epsd = 0.01, digits = 8,
-  print.info = FALSE, blinding = TRUE, multipleTry = 25, nproc = 1,
-  clustertype = NULL, file = "", .packages = NULL, minimize = TRUE, ...)
+mla(
+  b,
+  m = FALSE,
+  fn,
+  gr = NULL,
+  hess = NULL,
+  maxiter = 500,
+  epsa = 1e-04,
+  epsb = 1e-04,
+  epsd = 1e-04,
+  digits = 8,
+  print.info = FALSE,
+  blinding = TRUE,
+  multipleTry = 25,
+  nproc = 1,
+  clustertype = NULL,
+  file = "",
+  .packages = NULL,
+  minimize = TRUE,
+  ...
+)
 }
 \arguments{
 \item{b}{an optional vector containing the initial values for the
@@ -35,15 +69,15 @@ If missing, finite-difference approximation will be used.}
 iterative algorithm. Default is 500.}
 
 \item{epsa}{optional threshold for the convergence criterion based on the
-parameter stability. Default is 0.001.}
+parameter stability. Default is 0.0001.}
 
 \item{epsb}{optional threshold for the convergence criterion based on the
-objective function stability. Default is 0.001.}
+objective function stability. Default is 0.0001.}
 
 \item{epsd}{optional threshold for the relative distance to maximum. This
 criterion has the nice interpretation of estimating the ratio of the
 approximation error over the statistical error, thus it can be used for
-stopping the iterative process whathever the problem. Default is 0.01.}
+stopping the iterative process whathever the problem. Default is 0.0001.}
 
 \item{digits}{number of digits to print in outputs. Default value is 8.}
 

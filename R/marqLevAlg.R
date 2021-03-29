@@ -30,13 +30,13 @@
 #' @param maxiter optional maximum number of iterations for the marqLevAlg
 #' iterative algorithm. Default is 500.
 #' @param epsa optional threshold for the convergence criterion based on the
-#' parameter stability. Default is 0.001.
+#' parameter stability. Default is 0.0001.
 #' @param epsb optional threshold for the convergence criterion based on the
-#' objective function stability. Default is 0.001.
+#' objective function stability. Default is 0.0001.
 #' @param epsd optional threshold for the relative distance to maximum. This
 #' criterion has the nice interpretation of estimating the ratio of the
 #' approximation error over the statistical error, thus it can be used for
-#' stopping the iterative process whathever the problem. Default is 0.01.
+#' stopping the iterative process whathever the problem. Default is 0.0001.
 #' @param digits number of digits to print in outputs. Default value is 8.
 #' @param print.info logical indicating if information about computation should be
 #' reported at each iteration.
@@ -156,7 +156,7 @@
 #'nproc=2, clustertype="FORK")
 #'}
 
-marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.001,epsb=0.001,epsd=0.01,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
+marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,epsb=0.0001,epsd=0.0001,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
 	cl <- match.call()
 	if (missing(m) & missing(b)) stop("The 'marqLevAlg' algorithm needs a vector of parameters 'b' or his length 'm'")
 	if(missing(m)) m <- length(b)	
