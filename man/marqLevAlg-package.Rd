@@ -5,8 +5,8 @@
 \alias{marqLevAlg-package}
 \title{A parallelized general-purpose optimization based on Marquardt-Levenberg algorithm}
 \description{
-This algorithm provides a numerical solution to the problem of
-miniminzing/maximizing a function. This is more efficient than the
+This algorithm provides a numerical solution to the problem of unconstrained local
+minimization/maximization. This is more efficient than the
 Gauss-Newton-like algorithm when starting from points very far from the final
 minimum/maximum. A new convergence test
 is implemented (RDM) in addition to the usual stopping criterion : stopping

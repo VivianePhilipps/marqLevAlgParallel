@@ -1,7 +1,7 @@
 #' A parallelized general-purpose optimization based on Marquardt-Levenberg algorithm
 #'
-#' This algorithm provides a numerical solution to the problem of optimizing a
-#' function. This is more efficient than the Gauss-Newton-like algorithm when
+#' This algorithm provides a numerical solution to the problem of unconstrained local
+#' optimization. This is more efficient than the Gauss-Newton-like algorithm when
 #' starting from points very far from the final maximum. A new convergence test
 #' is implemented (RDM) in addition to the usual stopping criterion : stopping
 #' rule is when the gradients are small enough in the parameters metric
