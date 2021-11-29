@@ -58,7 +58,7 @@ searpas <- function(vw,step,b,delta,funcpa,res.out.error,...){
 			vlw3 <- vlw2
 			vlw2 <- vlw1
 			fi3 <- fi2
-			fi2 < fi1
+			fi2 <- fi1
 			vlw1=vlw2+step
 			fi1 <- valfpa(vlw1,b,delta,funcpa,...)
 			if(fi1 > fi2){
