@@ -15,7 +15,8 @@
 #' space.  If the parameters are on the boundaries of the parameter space, the
 #' identifiability of the model should be assessed.  If not, the program should
 #' be run again with other initial values, with a higher maximum number of
-#' iterations or less strict convergence tolerances.
+#' iterations or less strict convergence tolerances. An alternative is to remove some
+#' parameters from the Hessian matrix.
 #'
 #' @param b an optional vector containing the initial values for the
 #' parameters. Default is 0.1 for every parameter.
@@ -37,6 +38,11 @@
 #' criterion has the nice interpretation of estimating the ratio of the
 #' approximation error over the statistical error, thus it can be used for
 #' stopping the iterative process whathever the problem. Default is 0.0001.
+#' @param partialH optional vector giving the indexes of the parameters to be dropped from
+#' the Hessian matrix to define the relative distance to maximum/minimum. If specified,
+#' this option will only be considered at iterations where the two first convergence
+#' criteria are satisfied (epsa and epsb) and if the total Hessian is not invertible.
+#' By default, no partial Hessian is defined.
 #' @param digits number of digits to print in outputs. Default value is 8.
 #' @param print.info logical indicating if information about computation should be
 #' reported at each iteration.
@@ -156,7 +162,7 @@
 #'nproc=2, clustertype="FORK")
 #'}
 
-marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,epsb=0.0001,epsd=0.0001,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
+marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,epsb=0.0001,epsd=0.0001,partialH=NULL,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
 	cl <- match.call()
 	if (missing(m) & missing(b)) stop("The 'marqLevAlg' algorithm needs a vector of parameters 'b' or his length 'm'")
 	if(missing(m)) m <- length(b)	
@@ -340,7 +346,59 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 		if(dd<=old.dd){old.dd <- dd}
 		if((ca < epsa) & (cb < epsb) & (dd < epsd)){break}
 
-		
+            if((ca < epsa) & (cb < epsb) & (ier == -1) & (sum(partialH)>0)){
+
+                ## partial Hessian matrix 
+                mr <- m - length(partialH)
+                H <- matrix(NA, m, m)
+                H[upper.tri(H, diag=TRUE)] <- v[1:(m*(m+1)/2)]
+                Hr <- H[setdiff(1:m, partialH),setdiff(1:m, partialH)]
+                fur <- Hr[upper.tri(Hr, diag=TRUE)]
+                
+                ## inversion of the partial Hessian matrix
+                dsinvr <- .Fortran(C_dsinv,fu.out=as.double(fur),as.integer(mr),as.double(ep),ier=as.integer(0),det=as.double(0))
+
+                
+                ier <- dsinvr$ier
+		fur[1:(mr*(mr+1)/2)] <- dsinvr$fu.out
+		if (ier == -1){
+                    dd <- epsd+1
+                    if(print.info){
+                        cat("Inversion of partial Hessian matrix failed \n \n")
+                    }
+		}else{
+                    ## third convergence criteria with partial H
+                    vr <- rep(NA, mr*(mr+3)/2)
+                    ir <- 0
+                    for(i in 1:m) {
+                        if(!(i %in% partialH)){
+                            ir <- ir+1
+                            vr[mr*(mr+1)/2+ir] <- v[m*(m+1)/2+i]
+                        }
+                    }
+                    dd <- ghg(mr,vr,fur)$ghg/mr
+                    if(is.na(dd)) dd <- epsd+1
+		}
+
+                if(print.info){
+                    cat("RDM with partial Hessian matrix= ", dd, "\n \n")
+                }
+                
+                if(dd < epsd) {
+                    ## convergence with partial H
+                    istop <- 3
+                    v <- rep(NA, m*(m+3)/2)
+                    v[m*(m+1)/2 + setdiff(1:m, partialH)] <- vr
+                    Hr <- matrix(NA, mr, mr)
+                    Hr[upper.tri(Hr, diag=TRUE)] <- fur
+                    H <- matrix(NA, m, m)
+                    H[setdiff(1:m, partialH), setdiff(1:m, partialH)] <- Hr
+                    fu <- H[upper.tri(H, diag=TRUE)]
+                    break
+                }
+                
+            }
+            
 		tr <- 0
 		for(i in 1:m){
 			ii <- i*(i+1)/2

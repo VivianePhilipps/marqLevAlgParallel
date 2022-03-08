@@ -52,6 +52,7 @@ summary.marqLevAlg <- function(object,digits=8,loglik=FALSE,...){
     cat("      Number of iterations:", x$ni, "\n")
     cat("      Optimized objective function:", round(x$fn.value,digits)," \n")
     if(x$istop==1) cat("      Convergence criteria satisfied","\n")
+    if(x$istop==3) cat("      Convergence criteria with partial Hessian matrix satisfied","\n")
     if(x$istop==2) cat("      Maximum number of iteration reached without convergence","\n")
     if(x$istop==4|x$istop==5)  {
         cat("      The program stopped abnormally. No results can be displayed.\n")
@@ -75,7 +76,7 @@ summary.marqLevAlg <- function(object,digits=8,loglik=FALSE,...){
         cat("Final parameter values:", "\n")
         id <- 1:length(x$b)
         indice <- rep(id*(id+1)/2)
-        se <-sqrt(x$v[indice])
+        se <- sqrt(x$v[indice])
         wald <- (x$b/se)**2
         z <- abs(qnorm((1 + .95)/2))
         binf <- x$b-1.96*se

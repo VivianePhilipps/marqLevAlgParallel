@@ -42,6 +42,7 @@ cat("      Number of parameters:", length(x$b)," \n")
 cat("      Number of iterations:", x$ni, "\n")
 cat("      Optimized objective function:", round(x$fn.value,digits)," \n")
 if(x$istop==1) cat("      Convergence criteria satisfied","\n")
+if(x$istop==3) cat("      Convergence criteria with partial Hessian matrix satisfied","\n")
 if(x$istop==2) cat("      Maximum number of iteration reached without convergence","\n")
 if(x$istop==4|x$istop==5)  {
 	cat("      The program stopped abnormally. No results can be displayed.\n")

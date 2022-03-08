@@ -15,6 +15,7 @@ marqLevAlg(
   epsa = 1e-04,
   epsb = 1e-04,
   epsd = 1e-04,
+  partialH = NULL,
   digits = 8,
   print.info = FALSE,
   blinding = TRUE,
@@ -37,6 +38,7 @@ mla(
   epsa = 1e-04,
   epsb = 1e-04,
   epsd = 1e-04,
+  partialH = NULL,
   digits = 8,
   print.info = FALSE,
   blinding = TRUE,
@@ -78,6 +80,12 @@ objective function stability. Default is 0.0001.}
 criterion has the nice interpretation of estimating the ratio of the
 approximation error over the statistical error, thus it can be used for
 stopping the iterative process whathever the problem. Default is 0.0001.}
+
+\item{partialH}{optional vector giving the indexes of the parameters to be dropped from
+the Hessian matrix to define the relative distance to maximum/minimum. If specified,
+this option will only be considered at iterations where the two first convergence
+criteria are satisfied (epsa and epsb) and if the total Hessian is not invertible.
+By default, no partial Hessian is defined.}
 
 \item{digits}{number of digits to print in outputs. Default value is 8.}
 
@@ -138,7 +146,8 @@ estimates at the last iteration are not on the boundaries of the parameter
 space.  If the parameters are on the boundaries of the parameter space, the
 identifiability of the model should be assessed.  If not, the program should
 be run again with other initial values, with a higher maximum number of
-iterations or less strict convergence tolerances.
+iterations or less strict convergence tolerances. An alternative is to remove some
+parameters from the Hessian matrix.
 }
 \examples{
 
