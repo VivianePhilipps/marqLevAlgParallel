@@ -12,7 +12,7 @@ LazyData: true
 Description: This algorithm provides a numerical solution to the
         problem of unconstrained local minimization (or maximization). It is particularly suited for complex problems and more efficient than
         the Gauss-Newton-like algorithm when starting from points very
-        far from the final minimum (or maximum). Each iteration is parallelized and convergence relies on a stringent stopping criterion based on the first and second derivatives. See Philipps et al, 2020 <arXiv:2009.03840>.
+        far from the final minimum (or maximum). Each iteration is parallelized and convergence relies on a stringent stopping criterion based on the first and second derivatives. See Philipps et al, 2021 <doi:10.32614/RJ-2021-089>.
 License: GPL (>= 2.0)
 BugReports: https://github.com/VivianePhilipps/marqLevAlgParallel/issues
 Imports: doParallel, foreach

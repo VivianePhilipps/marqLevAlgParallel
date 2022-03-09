@@ -28,7 +28,7 @@
 #'
 #' Philipps V. Hejblum B.P. Prague M. Commenge D. Proust-Lima C.
 #' Robust and Efficient Optimization Using a Marquardt-Levenberg Algorithm
-#' with R Package marqLevAlg
+#' with R Package marqLevAlg. The R Journal (2021).
 #'
 #' Donald W. marquardt An algorithm for Least-Squares Estimation of Nonlinear
 #' Parameters. Journal of the Society for Industrial and Applied Mathematics,
