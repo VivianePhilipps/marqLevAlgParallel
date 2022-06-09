@@ -66,9 +66,11 @@
 #' \item{ni}{ number of marqLevAlg iterations before reaching stopping
 #' criterion.  } \item{istop}{ status of convergence: =1 if the convergence
 #' criteria were satisfied, =2 if the maximum number of iterations was reached,
+#' =3 if convergence criteria with partial Hessian matrix were satisfied,
 #' =4 if the algorithm encountered a problem in the function computation.  }
-#' \item{v}{ vector containing the upper triangle matrix of variance-covariance
-#' estimates at the stopping point.  } \item{grad}{vector containing the gradient
+#' \item{v}{if istop=1 or istop=3, vector containing the upper triangle matrix of variance-covariance
+#' estimates at the stopping point. Otherwise v contains the second derivatives
+#' of the fn function with respect to the parameters.} \item{grad}{vector containing the gradient
 #' at the stopping point.} \item{fn.value}{ function evaluation at
 #' the stopping point.  } \item{b}{ stopping point value.  } \item{ca}{
 #' convergence criteria for parameters stabilisation.  } \item{cb}{ convergence
@@ -327,17 +329,18 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 		cat("Convergence criteria: parameters stability=", round(ca,digits), "\n",file=file,append=TRUE)
 		cat("                    : function stability=", round(cb,digits), "\n",file=file,append=TRUE) 
 		cat("                    : relative distance to maximum(RDM)=", round(dd,digits), "\n",file=file,append=TRUE)
+		cat("Parameters: ", round(b,digits), "\n",file=file,append=TRUE)
 
-		nom.par <- paste("parameter",c(1:m),sep="")
-		id <- 1:m
-		indice <- rep(id*(id+1)/2)
-		Var <- fu[indice]
-		SE <- sqrt(abs(Var))
-		res.info <- data.frame("coef"=round(b,digits),"SE.coef"=round(SE,digits),"Var.coef"=round(Var,digits))
-		rownames(res.info) <- nom.par
-                if(file=="") print(res.info)
-                else write.table(res.info,file=file,append=TRUE)
-		cat("\n")
+		## nom.par <- paste("parameter",c(1:m),sep="")
+		## id <- 1:m
+		## indice <- rep(id*(id+1)/2)
+		## Var <- fu[indice]
+		## SE <- sqrt(abs(Var))
+		## res.info <- data.frame("coef"=round(b,digits),"SE.coef"=round(SE,digits),"Var.coef"=round(Var,digits))
+		## rownames(res.info) <- nom.par
+                ## if(file=="") print(res.info)
+                ## else write.table(res.info,file=file,append=TRUE)
+		## cat("\n")
 	}
 		old.b <- b
 		old.rl <- rl

@@ -120,9 +120,11 @@ of each iteration should be written (if print.info=TRUE).}
 \item{ni}{ number of marqLevAlg iterations before reaching stopping
 criterion.  } \item{istop}{ status of convergence: =1 if the convergence
 criteria were satisfied, =2 if the maximum number of iterations was reached,
+=3 if convergence criteria with partial Hessian matrix were satisfied,
 =4 if the algorithm encountered a problem in the function computation.  }
-\item{v}{ vector containing the upper triangle matrix of variance-covariance
-estimates at the stopping point.  } \item{grad}{vector containing the gradient
+\item{v}{if istop=1 or istop=3, vector containing the upper triangle matrix of variance-covariance
+estimates at the stopping point. Otherwise v contains the second derivatives
+of the fn function with respect to the parameters.} \item{grad}{vector containing the gradient
 at the stopping point.} \item{fn.value}{ function evaluation at
 the stopping point.  } \item{b}{ stopping point value.  } \item{ca}{
 convergence criteria for parameters stabilisation.  } \item{cb}{ convergence
