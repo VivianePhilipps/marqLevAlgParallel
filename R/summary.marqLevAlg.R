@@ -83,11 +83,16 @@ summary.marqLevAlg <- function(object,digits=8,loglik=FALSE,...){
         bsup <- x$b+1.96*se
 
         if(loglik==FALSE){
-            tmp <- data.frame("coef"=format(round(x$b,3)))
-            cat(format(round(x$b,3)),"\n")
+            tmp <- data.frame("coef"=format(round(x$b,3)),"grad"=format(round(x$grad,3)))
+            print(tmp,row.names=FALSE)
         }else{
-            tmp <- data.frame("coef"=format(round(x$b,3)),"SE coef"=format(round(se,3)),"Wald"=format(wald,4),"P-value"=round(1 - pchisq(wald, 1),5),"binf"=round(binf,3),"bsup"=round(bsup,3))
-            print(tmp,row.names=F)
+            if(x$istop %in% c(1,3)) {
+                tmp <- data.frame("coef"=format(round(x$b,3)),"SE coef"=format(round(se,3)),"Wald"=format(wald,4),"P-value"=round(1 - pchisq(wald, 1),5),"binf"=round(binf,3),"bsup"=round(bsup,3))
+            } else {
+                tmp <- data.frame("coef"=format(round(x$b,3)),"grad"=format(round(x$grad,3)))
+            }
+            
+            print(tmp,row.names=FALSE)
         }
         cat(" \n")
 
