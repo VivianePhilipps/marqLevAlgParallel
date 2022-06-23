@@ -206,8 +206,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 
 	flush.console()
 	ptm <- proc.time()
-	#cat("\n")
-	#cat("Be patient. The program is computing ...\n")
 	
 ###initialisation
 	binit <- b
@@ -243,14 +241,16 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 	
 		if (sum(!is.finite(b))>0){
 
-			cat("Probably too much accuracy requested...\n")
-			cat("Last step values :\n")
-			cat("      b :",round(old.b,digits),"\n")
-			cat("      objective function :",round(-old.rl,digits),"\n")
-			cat("      Convergence criteria: parameters stability=", round(old.ca,digits), "\n")
-			cat("                          : function stability=", round(old.cb,digits), "\n") 
-			cat("                          : best relative distance to maximum obtained (RDM)=", round(old.dd,digits), "\n")
-			stop("")
+                    cat("Infinite parameters...\n")
+                    cat("Last step values :\n")
+                    cat("      b :",round(old.b,digits),"\n")
+                    if(minimize){cat("      objective function :",round(-old.rl,digits),"\n")
+                    } else {cat("      objective function :",round(old.rl,digits),"\n")}
+                    cat("      Convergence criteria: parameters stability=", round(old.ca,digits), "\n")
+                    cat("                          : function stability=", round(old.cb,digits), "\n") 
+                    cat("                          : best relative distance to maximum obtained (RDM)=", round(old.dd,digits), "\n")
+                    istop <- 4
+                    break
 			 
 		}
 		res.out.error <- list("old.b"=round(old.b,digits),"old.rl"=round(old.rl,digits),"old.ca"=round(old.ca,digits),"old.cb"=round(old.cb,digits),"old.dd"=round(old.dd,digits))
@@ -289,16 +289,15 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 		if((sum(is.finite(b))==m) && !is.finite(rl)){
 			cat("Problem of computation. Verify your function specification...\n")
 			cat("Infinite value with finite parameters : b=",round(old.b,digits),"\n")
-		##	cat("      - Check the computation and the continuity,\n")
-		##  	cat("      - Check that you minimize the function.\n")
-			stop("")
-		
+                        istop <- 4
+                        break
 		}
 
 		if(((sum(!is.finite(b)) > 0) || (sum(!is.finite(rl)) > 0)) && (ni==0)){
 			cat("Problem of computation. Verify your function specification...\n")
-			cat("First check b length in parameters specification.\n")
-			stop("")
+			cat("Infinite value or parameters\n")
+			istop <- 4
+                        break
 		}
 		rl1 <- rl      
 		dd <- 0 
@@ -457,14 +456,16 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 		
 		if(blinding){
 			if(is.na(rl)){
-				cat("rl :",rl,"\n")
+				if(minimize)  cat("rl :",-rl,"\n") else cat("rl :",rl,"\n")
 				rl <- -500000
 			}
 		}else{
 			if(is.na(rl)){
 				cat(" Numerical problem by computing fn \n")
-				cat("          value of function is :",round(-rl,digits),"\n")
-				
+				if(minimize) {cat("          value of function is :",round(-rl,digits),"\n")
+                                }else{
+                                    cat("          value of function is :",round(rl,digits),"\n")
+				}
 				istop <- 4
 				break
 			}
