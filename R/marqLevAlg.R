@@ -250,6 +250,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
                     cat("                          : function stability=", round(old.cb,digits), "\n") 
                     cat("                          : best relative distance to maximum obtained (RDM)=", round(old.dd,digits), "\n")
                     istop <- 4
+                    rl <- -1.e9
                     break
 			 
 		}
@@ -290,6 +291,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			cat("Problem of computation. Verify your function specification...\n")
 			cat("Infinite value with finite parameters : b=",round(old.b,digits),"\n")
                         istop <- 4
+                        rl <- -1.e9
                         break
 		}
 
@@ -297,6 +299,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			cat("Problem of computation. Verify your function specification...\n")
 			cat("Infinite value or parameters\n")
 			istop <- 4
+                        rl <- -1.e9
                         break
 		}
 		rl1 <- rl      
@@ -467,6 +470,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
                                     cat("          value of function is :",round(rl,digits),"\n")
 				}
 				istop <- 4
+                                rl <- -1.e9
 				break
 			}
 		}
