@@ -1,32 +1,9 @@
 ---
 author:
-  - name: Viviane Philipps
-    affiliation: |
-      | Inserm, Bordeaux Population Health Research Center, UMR 1219, 
-      | Univ. Bordeaux, F-33000 Bordeaux, France \AND
-    address: |
-      | 146 rue Léo Saignat
-      | 33076 Bordeaux Cedex
-      | France
-    email: \email{viviane.philipps@u-bordeaux.fr}
-  - name: Boris P. Hejblum 
-    affiliation: ''
-  - name: Mélanie Prague
-    affiliation: |
-      | Univ. Bordeaux, Inserm, Bordeaux Population Health Research Center, 
-      | UMR 1219, Inria BSO SISTM, F-33000 Bordeaux, France
-  - name: Daniel Commenges  
-    affiliation: '\AND'
-  - name: Cécile Proust-Lima
-    affiliation: |
-      | Inserm, Bordeaux Population Health Research Center, 
-      | UMR 1219, Univ. Bordeaux, F-33000 Bordeaux, France
+  - name: Viviane Philipps, Boris P. Hejblum, Mélanie Prague, Daniel Commenges, Cécile Proust-Lima
 #  - name:
 #    affiliation: ''
-title:
-  formatted: "Robust and Efficient Optimization Using a Marquardt-Levenberg Algorithm with \\proglang{R} Package \\pkg{marqLevAlg}"
-  plain:     "Robust and Efficient Optimization Using a Marquardt-Levenberg Algorithm with R Package marqLevAlg"
-  short:     "The \\proglang{R} package \\pkg{marqLevAlg}"
+title: "Robust and Efficient Optimization Using a Marquardt-Levenberg Algorithm with R Package marqLevAlg"
 abstract: >
  Implementations in R of classical general-purpose algorithms generally have two major limitations which make them unusable in complex problems: too loose convergence criteria and too long calculation time. By relying on a Marquardt-Levenberg algorithm (MLA), a Newton-like method particularly robust for solving local optimization problems, we provide with marqLevAlg package an efficient and general-purpose local optimizer which (i) prevents convergence to saddle points by using a stringent convergence criterion based on the relative distance to minimum/maximum in addition to the stability of the parameters and of the objective function; and (ii) reduces the computation time in complex settings by allowing parallel calculations at each iteration. We demonstrate through a variety of cases from the literature that our implementation reliably and consistently reaches the optimum (even when other optimizers fail), and also largely reduce computational time in complex settings through the example of maximum likelihood estimation of different sophisticated statistical models.
 keywords:
@@ -37,9 +14,10 @@ preamble: >
   \usepackage{amssymb}
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
-documentclass: jss
-classoption: nojss
-output: if(rmarkdown::pandoc_version()>= 2.2) rticles::jss_article else rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true # table of content true
+    toc_depth : 2 
 vignette: >
   %\VignetteIndexEntry{MLA}
   %\VignetteEngine{knitr::rmarkdown}
@@ -54,11 +32,11 @@ Optimization is an essential task in many computational problems. In statistical
 
 Steepest descent algorithms are among the most famous general optimization algorithms. They generally consist in updating parameters according to the steepest gradient (gradient descent) possibly scaled by the Hessian in the Newton (Newton-Raphson) algorithm or an approximation of the Hessian based on the gradients in the quasi-Newton algorithms (e.g., Broyden-Fletcher-Goldfarb-Shanno \--- BFGS). Newton-like algorithms have been shown to provide good convergence properties [@joe_numerical_2003] and were demonstrated in particular to behave better than Expectation-Maximization (EM) algorithms in several contexts of Maximum Likelihood Estimation, such as the random-effect models [@lindstrom_newtonraphson_1988] or the latent class models [@proust_estimation_2005]. Among Newton methods, the Marquardt-Levenberg algorithm, initially proposed by Levenberg [@levenberg_method_1944] then Marquardt [@marquardt_algorithm_1963], combines BFGS and gradient descent methods to provide a more robust optimization algorithm. As other Newton methods, Marquardt-Levenberg algorithm is designed to find a local optimum of the objective function from given initial values. When dealing with multimodal objective functions, it can thus converge to local optimum, and needs to be combined with a grid search to retrieve the global optimum.
 
-The \proglang{R} software includes multiple solutions for optimization tasks (see CRAN task View on ``Optimization and Mathematical Programming'' [@optimization]). In particular the \code{optim} function in \pkg{base} \proglang{R} offers different algorithms for general purpose optimization, and so does \code{optimx} \--- a more recent package extending \code{optim}  [@nash_2011]. Numerous additional packages are available for different contexts, from nonlinear least square problems (including some exploiting Marquardt-Levenberg idea like \pkg{minpack.lm} [@elzhov_2016] and \pkg{nlmrt} [@nlmrt_2016]) to stochastic optimization and algorithms based on the simplex approach. However, \proglang{R} software could benefit from a general-purpose \proglang{R} implementation of Marquardt-Levenberg algorithm. 
+The `R` software includes multiple solutions for optimization tasks (see CRAN task View on ''Optimization and Mathematical Programming'' [@optimization]). In particular the \code{optim} function in **base** `R` offers different algorithms for general purpose optimization, and so does \code{optimx} \--- a more recent package extending \code{optim}  [@nash_2011]. Numerous additional packages are available for different contexts, from nonlinear least square problems (including some exploiting Marquardt-Levenberg idea like **minpack.lm** [@elzhov_2016] and **nlmrt** [@nlmrt_2016]) to stochastic optimization and algorithms based on the simplex approach. However, `R` software could benefit from a general-purpose `R` implementation of Marquardt-Levenberg algorithm. 
 
 Moreover, while optimization can be easily achieved in small dimension, the increasing complexity of statistical models leads to critical issues. First, the large dimension of the objective function can induce excessively long computation times. Second, with complex objective functions, it is more likely to encounter flat regions, so that convergence cannot be assessed according to objective function stability anymore. 
 
-To address these two issues, we propose a \proglang{R} implementation of the Levenberg-Marquardt algorithm in the package \pkg{marqLevAlg} which relies on a stringent convergence criterion based on the first and second derivatives to avoid loosely convergence [@prague:hal-00717566] and includes (from version 2.0.1) parallel computations within each iteration to speed up convergence in complex settings. 
+To address these two issues, we propose a `R` implementation of the Levenberg-Marquardt algorithm in the package **marqLevAlg** which relies on a stringent convergence criterion based on the first and second derivatives to avoid loosely convergence [@prague:hal-00717566] and includes (from version 2.0.1) parallel computations within each iteration to speed up convergence in complex settings. 
 
 Section 2 and 3 describe the algorithm and the implementation, respectively. Then Section 4 provides an example of call with the estimation of a linear mixed model. A benchmark of the package is reported in Section 5 with the performances of parallel implementation. Performances of Marquardt-Levenberg algorithm implementation are also challenged in Section 6 using a variety of simple and complex examples from the literature, and compared with other optimizers. Finally Section 7 concludes.
 
@@ -81,7 +59,7 @@ When the problem encounters a unique solution, the minimum is reached whatever t
 
 ## Stringent convergence criteria {#sec:criteria}
 
-As in any iterative algorithm, convergence of MLA is achieved when convergence criteria are fullfilled. In \pkg{marqLevAlg} package, convergence is defined according to three criteria:
+As in any iterative algorithm, convergence of MLA is achieved when convergence criteria are fullfilled. In **marqLevAlg** package, convergence is defined according to three criteria:
 
 - parameters stability: $\sum_{j=1}^{m} (\theta_{j}^{(k+1)}-\theta_{j}^{(k)})^2 < \epsilon_a$
 
@@ -98,7 +76,7 @@ The three thresholds $\epsilon_a$, $\epsilon_b$ and $\epsilon_d$ can be adjusted
 
 ## Derivatives calculation
 
-MLA update relies on first ($\nabla(\mathcal{F}(\theta^{(k)}))$) and second ($H(\mathcal{F}(\theta^{(k)}))$) derivatives of the objective function $\mathcal{F}(\theta^{(k)})$ at each iteration k. The gradient and the Hessian may sometimes be calculated analytically but in a general framework, numerical approximation can become necessary. In \pkg{marqLevAlg} package, in the absence of analytical gradient computation, the first derivatives are computed by central finite differences. In the absence of analytical Hessian, the second derivatives are computed using forward finite differences. The step of finite difference for each derivative depends on the value of the involved parameter. It is set to $\max(10^{-7},10^{-4}|\theta_j|)$ for parameter $j$.
+MLA update relies on first ($\nabla(\mathcal{F}(\theta^{(k)}))$) and second ($H(\mathcal{F}(\theta^{(k)}))$) derivatives of the objective function $\mathcal{F}(\theta^{(k)})$ at each iteration k. The gradient and the Hessian may sometimes be calculated analytically but in a general framework, numerical approximation can become necessary. In **marqLevAlg** package, in the absence of analytical gradient computation, the first derivatives are computed by central finite differences. In the absence of analytical Hessian, the second derivatives are computed using forward finite differences. The step of finite difference for each derivative depends on the value of the involved parameter. It is set to $\max(10^{-7},10^{-4}|\theta_j|)$ for parameter $j$.
 
 When both the gradient and the Hessian are to be numerically computed, numerous evaluations of $\mathcal{F}$ are required at each iteration: 
 
@@ -133,7 +111,7 @@ marqLevAlg(b, m = FALSE, fn, gr = NULL, hess = NULL, maxiter = 500,
 \end{verbatim}
 
 
-Argument \code{b} is the set of initial parameters; alternatively its length \code{m} can be entered. \code{fn} is the function to optimize; it should take the parameter vector as first argument, and additional arguments are passed in \dots . Optional \code{gr} and \code{hess} refer to the functions implementing the analytical calculations of the gradient and the Hessian matrix, respectively. \code{maxiter} is the maximum number of iterations. Arguments \code{epsa}, \code{epsb} and \code{epsd} are the thresholds for the three convergence criteria defined in Section \ref{sec:criteria}. \code{print.info} specifies if details on each iteration should be printed; such information can be reported in a file if argument \code{file} is specified, and \code{digits} indicates the number of decimals in the eventually reported information during optimization. \code{blinding} is an option allowing the algorithm to go on even when the \code{fn} function returns NA, which is then replaced by the arbitrary value of $500,000$ (for minimization) and -$500,000$ (for maximization). Similarly, if an infinite value is found for the chosen initial values, the \code{multipleTry} option will internally reshape \code{b} (up to \code{multipleTry} times) until a finite value is get, and the algorithm can be correctly initialized. The parallel framework is first stated by the \code{nproc} argument which gives the number of cores and by the \code{clustertype} argument (see the next section). In the case where the \code{fn} function depends on \proglang{R} packages, these should be given as a character vector in the \code{.packages} argument. Finally, the \code{minimize} argument offers the possibility to minimize or maximize the objective function \code{fn}; a maximization problem is implemented as the minimization of the opposite function (\code{-fn}).
+Argument \code{b} is the set of initial parameters; alternatively its length \code{m} can be entered. \code{fn} is the function to optimize; it should take the parameter vector as first argument, and additional arguments are passed in \dots . Optional \code{gr} and \code{hess} refer to the functions implementing the analytical calculations of the gradient and the Hessian matrix, respectively. \code{maxiter} is the maximum number of iterations. Arguments \code{epsa}, \code{epsb} and \code{epsd} are the thresholds for the three convergence criteria defined in Section \ref{sec:criteria}. \code{print.info} specifies if details on each iteration should be printed; such information can be reported in a file if argument \code{file} is specified, and \code{digits} indicates the number of decimals in the eventually reported information during optimization. \code{blinding} is an option allowing the algorithm to go on even when the \code{fn} function returns NA, which is then replaced by the arbitrary value of $500,000$ (for minimization) and -$500,000$ (for maximization). Similarly, if an infinite value is found for the chosen initial values, the \code{multipleTry} option will internally reshape \code{b} (up to \code{multipleTry} times) until a finite value is get, and the algorithm can be correctly initialized. The parallel framework is first stated by the \code{nproc} argument which gives the number of cores and by the \code{clustertype} argument (see the next section). In the case where the \code{fn} function depends on `R` packages, these should be given as a character vector in the \code{.packages} argument. Finally, the \code{minimize} argument offers the possibility to minimize or maximize the objective function \code{fn}; a maximization problem is implemented as the minimization of the opposite function (\code{-fn}).
 
 ## Implementation of parallel computations
 
@@ -141,7 +119,7 @@ In the absence of analytical gradient calculation, derivatives are computed in t
 
 When the gradient is calculated analytically, the \code{deriva} subfunction is replaced by the \code{deriva_grad} subfunction. It is parallelized in the same way but the parallelization being executed over $m$ elements, the performance should be bounded at $m$ cores.
 
-In all cases, the parallelization is achieved using the \pkg{doParallel} and \pkg{foreach} packages. The snow and multicore options of the \code{doParallel} backend are kept, making the parallel option of \pkg{marqLevAlg} package available on all systems. The user specifies the type of parallel environment among FORK, SOCK or MPI in argument \code{clustertype} and the number of cores in \code{nproc}. For instance, \code{clustertype = "FORK", nproc = 6} will use FORK technology and 6 cores. 
+In all cases, the parallelization is achieved using the **doParallel** and **foreach** packages. The snow and multicore options of the \code{doParallel} backend are kept, making the parallel option of **marqLevAlg** package available on all systems. The user specifies the type of parallel environment among FORK, SOCK or MPI in argument \code{clustertype} and the number of cores in \code{nproc}. For instance, \code{clustertype = "FORK", nproc = 6} will use FORK technology and 6 cores. 
 
 # Example 
 
@@ -248,7 +226,7 @@ print(xtable(cbind(coef(estim), coef(estim2), coef(estim3)),digits = 4,  label =
 
 # Benchmark
 
-We aimed at evaluating and comparing the performances of the parallelization in some time consuming examples. We focused on three examples of sophisticated models from the mixed models area estimated by maximum likelihood. These examples rely on packages using three different languages, thus illustrating the behavior of \pkg{marqLevAlg} package with a program exclusively written in \proglang{R} (\pkg{JM}, @rizopoulos_jm_2010), and programs including  \proglang{Rcpp} (\pkg{CInLPN}, @tadde_dynmod) and \proglang{Fortran90} (\pkg{lcmm}, @proust-lima_lcmm_2017) languages widely used in complex situations.
+We aimed at evaluating and comparing the performances of the parallelization in some time consuming examples. We focused on three examples of sophisticated models from the mixed models area estimated by maximum likelihood. These examples rely on packages using three different languages, thus illustrating the behavior of **marqLevAlg** package with a program exclusively written in `R` (**JM**, @rizopoulos_jm_2010), and programs including  \proglang{Rcpp} (**CInLPN**, @tadde_dynmod) and \proglang{Fortran90} (**lcmm**, @proust-lima_lcmm_2017) languages widely used in complex situations.
 
 We first describe the generated dataset on which the benchmark has been realized. We then intoduce each statistical model and associated program. Finally, we detail the results obtained with the three programs. Each time, the model has been estimated sequentially and with a varying number of cores in order to provide the program speed-up. We used a Linux cluster with 32 cores machines and 100 replicates to assess the variability. Codes and dataset used in this section are available at \url{https://github.com/VivianePhilipps/marqLevAlgPaper.}
 
@@ -289,7 +267,7 @@ structure(list(i = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3,
 
 ### Joint shared random effect model for a longitudinal marker and a time to event: package JM 
 
-The maximum likelihood estimation of joint shared random effect models has been made available in \proglang{R} with the \pkg{JM} package [@rizopoulos_jm_2010]. The implemented optimization functions are \code{optim} and \code{nlminb}. We added the \code{marqLevALg} function for the purpose of this example. 
+The maximum likelihood estimation of joint shared random effect models has been made available in `R` with the **JM** package [@rizopoulos_jm_2010]. The implemented optimization functions are \code{optim} and \code{nlminb}. We added the \code{marqLevALg} function for the purpose of this example. 
 We considered a subsample of the simulated dataset, consisting in $5,000$ randomly selected subjects.
 
 The joint shared random effect model is divided into two submodels jointly estimated: 
@@ -316,11 +294,11 @@ The length of the total vector of parameters $\theta$ to estimate was 40 (20 fix
 
 One particularity of this model is that the log-likelihood does not have a closed form. It involves an integral over the random effects (here, of dimension 4) which is numerically computed using an adaptive Gauss-Hermite quadrature with 3 integration points for this example.
 
-As package \pkg{JM} includes an analytical computation of the gradient, we ran two estimations: one with the analytical gradient and one with the numerical approximation to compare the speed up and execution times.
+As package **JM** includes an analytical computation of the gradient, we ran two estimations: one with the analytical gradient and one with the numerical approximation to compare the speed up and execution times.
 
 ### Latent class linear mixed model: package lcmm
 
-The second example is a latent class linear mixed model, as implemented in the \code{hlme} function of the \pkg{lcmm} \proglang{R} package. The function uses a previous implementation of the Marquardt algorithm coded in \proglang{Fortran90} and in sequential mode. For the purpose of this example, we extracted the log-likelihood computation programmed in \proglang{Fortran90} to be used with \pkg{marqLevAlg} package. 
+The second example is a latent class linear mixed model, as implemented in the \code{hlme} function of the **lcmm** `R` package. The function uses a previous implementation of the Marquardt algorithm coded in \proglang{Fortran90} and in sequential mode. For the purpose of this example, we extracted the log-likelihood computation programmed in \proglang{Fortran90} to be used with **marqLevAlg** package. 
 
 The latent class linear mixed model consists in two submodels estimated jointly: 
 
@@ -340,7 +318,7 @@ The log-likelihood of this model has a closed form but it involves the logarithm
 
 ### Multivariate latent process mixed model: package CInLPN
 
-The last example is provided by the \pkg{CInLPN} package, which relies on the \proglang{Rcpp} language. The function fits a multivariate linear mixed model combined with a system of difference equations in order to retrieve temporal influences between several repeated markers [@tadde_dynmod]. We used the data example provided in the package where three continuous markers \code{L_1}, \code{L_2}, \code{L_3} were repeatedly measured over time. The model related each marker $k$ ($k=1,2,3$) measured at observation times $t_{ijk}$ ($j=1,...,T$) to its underlying level $\Lambda_{ik}(t_{ijk})$ as follows: $$\text{L}_{ik}(t_{ijk}) = \eta_{0k}+ \eta_{1k} \Lambda_{ik}(t_{ijk}) +\epsilon_{ijk}$$
+The last example is provided by the **CInLPN** package, which relies on the \proglang{Rcpp} language. The function fits a multivariate linear mixed model combined with a system of difference equations in order to retrieve temporal influences between several repeated markers [@tadde_dynmod]. We used the data example provided in the package where three continuous markers \code{L_1}, \code{L_2}, \code{L_3} were repeatedly measured over time. The model related each marker $k$ ($k=1,2,3$) measured at observation times $t_{ijk}$ ($j=1,...,T$) to its underlying level $\Lambda_{ik}(t_{ijk})$ as follows: $$\text{L}_{ik}(t_{ijk}) = \eta_{0k}+ \eta_{1k} \Lambda_{ik}(t_{ijk}) +\epsilon_{ijk}$$
 where $\epsilon_{ijk}$ are independent Gaussian errors and $(\eta_0,\eta_1)$ parameters to estimate. Simultaneously, the structural model defines the initial state at time 0 ($\Lambda_{ik}(0)$) and the change over time at subsequent times $t$ with $\delta$ is a discretization step:
 
 $$
@@ -498,9 +476,9 @@ In these 7 examples, the speed up systematically reached almost 2 with 2 cores, 
 ## Other Marquardt-Levenberg implementations
 
 
-The Marquardt-Levenberg algorithm has been previouly implemented in the context of nonlinear least squares problems in \pkg{minpack.lm} and \pkg{nlmrt}. We ran the examples provided in these two packages with \code{marqLevAlg} and compared the algorithms in terms of final solution (that is the residual sum-of-squares) and runtime. Results are shown in supplementary material. Our implementation reached exactly the same value as the two others but performed slower in these simple examples.
+The Marquardt-Levenberg algorithm has been previouly implemented in the context of nonlinear least squares problems in **minpack.lm** and **nlmrt**. We ran the examples provided in these two packages with \code{marqLevAlg} and compared the algorithms in terms of final solution (that is the residual sum-of-squares) and runtime. Results are shown in supplementary material. Our implementation reached exactly the same value as the two others but performed slower in these simple examples.
 
-We also compared the sensitivity to initial values of \code{marqLevAlg} with \pkg{minpack.lm} using a simple example from \pkg{minpack.lm}. We ran the two implementations of MLA on 100 simulated datasets each one from 100 different starting points (see suppementary material). On the 10000 runs, \code{marqLevAlg} converged in 51.55\% of the cases whereas the \pkg{minpack.lm} converged in 65.98\% of the cases. However, 1660 estimations that converged according to nls.lm criteria were far from the effective optimum. This reduced the proportion of satisfying convergences with \pkg{minpack.lm} to 49.38\% (so similar rate as \code{marqLevAlg}) but more importantly illustrates the convergence to saddle points when using classical convergence criteria. In contrast, all the convergences with \pkg{marqLevAlg} were closed to the effective solution thanks to its stringent RDM convergence criterion.
+We also compared the sensitivity to initial values of \code{marqLevAlg} with **minpack.lm** using a simple example from **minpack.lm**. We ran the two implementations of MLA on 100 simulated datasets each one from 100 different starting points (see suppementary material). On the 10000 runs, \code{marqLevAlg} converged in 51.55\% of the cases whereas the **minpack.lm** converged in 65.98\% of the cases. However, 1660 estimations that converged according to nls.lm criteria were far from the effective optimum. This reduced the proportion of satisfying convergences with **minpack.lm** to 49.38\% (so similar rate as \code{marqLevAlg}) but more importantly illustrates the convergence to saddle points when using classical convergence criteria. In contrast, all the convergences with **marqLevAlg** were closed to the effective solution thanks to its stringent RDM convergence criterion.
 
 
 ## Examples from the litterature
@@ -512,12 +490,12 @@ We tested our algorithm on 35 optimization problems designed by \citet{more_1981
 
 Our implementation is particularly dedicated to complex problems involving many parameters and/or complex objective function calculation. We illustrate here its performances and compare them with other algorithms for the likelihood maximization of a joint model for longitudinal and time-to-event data.
 
-The \pkg{JM} package (@rizopoulos_jm_2010), dedicated to the maximum likelihood estimation of joint models, includes several optimization algorithms, namely the BFGS of \code{optim} function, and an expectation-maximization technique internally implemented. It thus offers a nice framework to compare the reliability of MLA to find the maximum likelihood in a complex setting with the reliability of other optimization algorithms. We used in this comparison the \code{prothro} dataset described in the \pkg{JM} package and elsewhere [@skrondal_generalized_2004,@andersen_statistical_1993]. It consists of a randomized trial in which 488 subjects were split into two treatment arms (prednisone *versus* placebo). Repeated measures of prothrombin ratio were collected over time as well as time to death. 
+The **JM** package (@rizopoulos_jm_2010), dedicated to the maximum likelihood estimation of joint models, includes several optimization algorithms, namely the BFGS of \code{optim} function, and an expectation-maximization technique internally implemented. It thus offers a nice framework to compare the reliability of MLA to find the maximum likelihood in a complex setting with the reliability of other optimization algorithms. We used in this comparison the \code{prothro} dataset described in the **JM** package and elsewhere [@skrondal_generalized_2004,@andersen_statistical_1993]. It consists of a randomized trial in which 488 subjects were split into two treatment arms (prednisone *versus* placebo). Repeated measures of prothrombin ratio were collected over time as well as time to death. 
 The longitudinal part of the joint model included a linear trajectory with time in the study, an indicator of first measurement and their interaction with treatment group. Were also included correlated individual random effects on the intercept and the slope with time. The survival part was a proportional hazard model adjusted for treatment group as well as the dynamics of the longitudinal outcome either through the current value of the marker or its slope or both. The baseline risk function was approximated by B-splines with one internal knot. The total number of parameters to estimate was 17 or 18 (10 for the longitudinal submodel, and 7 for the survival submodel considering only the curent value of the marker or its slope or 8 for the survival model when both the current level and the slope were considered). The marker initially ranged from 6 to 176 (mean=79.0, sd=27.3). 
 
 To investigate the consistency of the results to different dimensions of the marker, we also considered cases where the marker was rescaled by a factor 0.1 or 10. In these cases, the log-likelihood was rescaled a posteriori to the original dimension of the marker to make the comparisons possible. The starting point was systematically set at the default initial value of the \code{jointModel} function, which is the estimation point obtained from the separated linear mixed model and proportional hazard model. 
 
-In addition to EM and BFGS included in \code{JM} package, we also compared the MLA performances with those of the parallel implementation of the L-BFGS-B algorithm provided by the \pkg{optimParallel} package.
+In addition to EM and BFGS included in \code{JM} package, we also compared the MLA performances with those of the parallel implementation of the L-BFGS-B algorithm provided by the **optimParallel** package.
 Codes and dataset used in this section are available at \url{https://github.com/VivianePhilipps/marqLevAlgPaper}.
 
 MLA and L-BFGS-B ran on 3 cores. MLA converged when the three criteria defined in section \ref{sec:criteria} were satisfied with tolerance 0.0001, 0.0001 and 0.0001 for the parameters, the likelihood and the RDM, respectively. BFGS converged when the convergence criterion on the log-likelihood was satisfied with the square root of the tolerance of the machine ($\approx 10^{-8}$). The EM algorithm converged when stability on the parameters or on the log-likelihood was satisfied with tolerance 0.0001 and around $10^{-8}$ (i.e., the square root of the tolerance of the machine), respectively.
@@ -596,7 +574,7 @@ Finally, for BFGS, the problem of convergence is even more apparent when the out
 
 # Concluding remarks
 
-We proposed in this paper a general-purpose optimization algorithm based on a robust Marquardt-Levenberg algorithm. The program, written in \proglang{R} and \proglang{Fortran90}, is available in \pkg{marqLevAlg} \proglang{R} package. It provides a very nice alternative to other optimization packages available in \proglang{R} software such as \pkg{optim}, \pkg{roptim} [@pan_2020] or \pkg{optimx}  [@nash_2011] for addressing complex optimization problems. In particular, as shown in our examples, notably the estimation of joint models, it is more reliable than classical alternatives (EM and BFGS). This is due to the very good convergence properties of the Marquardt-Levenberg algorithm associated with very stringent convergence criteria based on the first and second derivatives of the objective function which avoids spurious convergence at saddle points [@commenges_rvs_2006]. 
+We proposed in this paper a general-purpose optimization algorithm based on a robust Marquardt-Levenberg algorithm. The program, written in `R` and \proglang{Fortran90}, is available in **marqLevAlg** `R` package. It provides a very nice alternative to other optimization packages available in `R` software such as **optim**, **roptim** [@pan_2020] or **optimx**  [@nash_2011] for addressing complex optimization problems. In particular, as shown in our examples, notably the estimation of joint models, it is more reliable than classical alternatives (EM and BFGS). This is due to the very good convergence properties of the Marquardt-Levenberg algorithm associated with very stringent convergence criteria based on the first and second derivatives of the objective function which avoids spurious convergence at saddle points [@commenges_rvs_2006]. 
 
 The Marquardt-Levenberg algorithm is known for its very computationally intensive iterations due to the computation of the first and second derivatives. However, first, compared to other algorithms, it converges in a very small number of iterations (usually less than 30 iterations). 
 This may not make MLA competitive in terms of running time in simple and rapid settings. However, the parallel computations of the derivatives can largely speed up the program and make it very competitive with
@@ -608,9 +586,9 @@ As any other optimization algorithm based on the steepest descent, MLA
 is a local optimizer. It does not ensure the convergence of multimodal objective functions toward
 the global optimum. In such a context we recommend the use of a grid search which consists in running the algorithm from a grid of (random) initial values and retaining the best result as the final solution. We illustrate in supplementary material how this technique succeeds in finding the global minimum with the Wild function of the \code{optim} help page.
 
-\pkg{marqLevAlg} is not the first optimizer to exploit parallel computations. Oyther R optimizers include a parallel mode, in particular stochastic optimization packages like \pkg{DEoptim} [@DEoptim_2011], \pkg{GA} [@ga_2017], \pkg{rgenoud} [@rgenoud_2011] or  \pkg{hydroPSO} [@hydroPSO_2020]. We compared these packages, the local optimizer of \code{optimParallel}, and \pkg{marqLevAlg} for the estimation of the liner mixed model described in section \ref{example}. For this specific problem \code{marqLevAlg} was the fastest, followed by \code{optimParallel} (results shown in supplementary files).
+**marqLevAlg** is not the first optimizer to exploit parallel computations. Oyther R optimizers include a parallel mode, in particular stochastic optimization packages like **DEoptim** [@DEoptim_2011], **GA** [@ga_2017], **rgenoud** [@rgenoud_2011] or  **hydroPSO** [@hydroPSO_2020]. We compared these packages, the local optimizer of \code{optimParallel}, and **marqLevAlg** for the estimation of the liner mixed model described in section \ref{example}. For this specific problem \code{marqLevAlg} was the fastest, followed by \code{optimParallel} (results shown in supplementary files).
 
-With its parallel implementation of derivative calculations combined with very good convergence properties of MLA, \pkg{marqLevAlg} package provides a promising solution for the estimation of complex statistical models in \proglang{R}. We have chosen for the moment to parallelize the derivatives which is very useful for optimization problems involving many parameters. However we could also easily parallelize the computation of the objective function when the latter is decomposed into independent sub-computations as is the log-likelihood computed independently on the statistical units. This alternative is currently under development. 
+With its parallel implementation of derivative calculations combined with very good convergence properties of MLA, **marqLevAlg** package provides a promising solution for the estimation of complex statistical models in `R`. We have chosen for the moment to parallelize the derivatives which is very useful for optimization problems involving many parameters. However we could also easily parallelize the computation of the objective function when the latter is decomposed into independent sub-computations as is the log-likelihood computed independently on the statistical units. This alternative is currently under development. 
 
 
 # Funding
@@ -955,4 +933,5 @@ rownames(res) <- c("minimum", "param")
 ```{r resgridsearch, results="asis", echo=FALSE}
 print(xtable(res, digits=4, align=c("l", "r", "r"), caption="Optimization results on the Wild function with algorithm SANN and MLA", label="tab:resgridsearch"), comment=FALSE, table.placement="h!")
 ```
+&nbsp;
 

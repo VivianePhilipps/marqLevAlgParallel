@@ -184,10 +184,10 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
         
         if(nproc>1){
             if(is.null(clustertype)){
-                clustpar <- parallel::makeCluster(nproc, outfile="")
+                clustpar <- parallel::makeCluster(nproc)#, outfile="")
             }
             else{
-                clustpar <- parallel::makeCluster(nproc, type=clustertype, outfile="")
+                clustpar <- parallel::makeCluster(nproc, type=clustertype)#, outfile="")
             }
             
             doParallel::registerDoParallel(clustpar)
