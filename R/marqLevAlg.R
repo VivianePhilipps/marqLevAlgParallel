@@ -235,7 +235,8 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 	old.rl <- 0
 	old.ca <- 1
 	old.cb <- 1
-	old.dd <- 1	
+	old.dd <- 1
+        ier <- 0
 ## 	
 	repeat{	
 	
@@ -387,7 +388,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
                     ## convergence with partial H
                     istop <- 3
                     v <- rep(NA, m*(m+3)/2)
-                    v[m*(m+1)/2 + setdiff(1:m, partialH)] <- vr
+                    v[m*(m+1)/2 + setdiff(1:m, partialH)] <- vr[mr*(mr+1)/2+1:mr]
                     Hr <- matrix(NA, mr, mr)
                     Hr[upper.tri(Hr, diag=TRUE)] <- fur
                     H <- matrix(NA, m, m)
