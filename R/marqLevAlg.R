@@ -214,6 +214,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 	nfmax <- m*(m+1)/2    
 	ca <- epsa+1
 	cb <- epsb+1
+        dd <- epsd+1
 	rl1 <- -1.e+10    
 	ni <- 0
 	istop <- 0
