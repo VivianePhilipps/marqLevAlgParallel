@@ -59,6 +59,7 @@
 #' @param file optional character giving the name of the file where the outputs
 #' of each iteration should be written (if print.info=TRUE).
 #' @param .packages for parallel setting only, packages used in the fn function
+#' @param .export for parallel setting only, objects used in the fn function
 #' @param minimize logical indicating if the fn function should be minimized or maximized. By default minimize=TRUE, the function is minimized.
 #' @param \dots other arguments of the fn, gr and hess functions 
 #'
@@ -164,7 +165,7 @@
 #'nproc=2, clustertype="FORK")
 #'}
 
-marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,epsb=0.0001,epsd=0.0001,partialH=NULL,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,minimize=TRUE,...){
+marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,epsb=0.0001,epsd=0.0001,partialH=NULL,digits=8,print.info=FALSE,blinding=TRUE,multipleTry=25,nproc=1,clustertype=NULL,file="",.packages=NULL,.export=NULL,minimize=TRUE,...){
 	cl <- match.call()
 	if (missing(m) & missing(b)) stop("The 'marqLevAlg' algorithm needs a vector of parameters 'b' or his length 'm'")
 	if(missing(m)) m <- length(b)	
@@ -259,7 +260,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 		res.out.error <- list("old.b"=round(old.b,digits),"old.rl"=round(old.rl,digits),"old.ca"=round(old.ca,digits),"old.cb"=round(old.cb,digits),"old.dd"=round(old.dd,digits))
 	
 		if(is.null(gr)){ 
-			deriv <- deriva(nproc,b,funcpa,.packages=.packages,...)
+			deriv <- deriva(nproc,b,funcpa,.packages=.packages,.export=.export,...)
 			v <- deriv$v
 			rl <- deriv$rl
 			
@@ -268,7 +269,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 				while(((kk < multipleTry) & (!is.finite(rl)))){
 					kk <- kk + 1
 					b <- b/2
-					deriv <- deriva(nproc,b,funcpa,.packages=.packages,...)
+					deriv <- deriva(nproc,b,funcpa,.packages=.packages,.export=.export,...)
 					v <- deriv$v
 					rl <- deriv$rl
 				}
@@ -278,7 +279,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			rl=funcpa(b,...)
 			
 			if(is.null(hess)){
-				deriv <- deriva_grad(nproc=nproc,b,grad,.packages=.packages,...)
+				deriv <- deriva_grad(nproc=nproc,b,grad,.packages=.packages,.export=.export,...)
 				v <- c(v,deriv$hessian,grad(b,...))
 			}else{
 				tmp.hessian <- hessian(b,...) 

@@ -24,6 +24,7 @@ marqLevAlg(
   clustertype = NULL,
   file = "",
   .packages = NULL,
+  .export = NULL,
   minimize = TRUE,
   ...
 )
@@ -47,6 +48,7 @@ mla(
   clustertype = NULL,
   file = "",
   .packages = NULL,
+  .export = NULL,
   minimize = TRUE,
   ...
 )
@@ -110,6 +112,8 @@ changing the starting point of the algorithm. Default value is 25.}
 of each iteration should be written (if print.info=TRUE).}
 
 \item{.packages}{for parallel setting only, packages used in the fn function}
+
+\item{.export}{for parallel setting only, objects used in the fn function}
 
 \item{minimize}{logical indicating if the fn function should be minimized or maximized. By default minimize=TRUE, the function is minimized.}
 

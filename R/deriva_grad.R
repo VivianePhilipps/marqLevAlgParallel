@@ -8,6 +8,7 @@
 #' @param b value of parameters to be optimized over
 #' @param grad the gradient of the function to be minimized (or maximized)
 #' @param .packages character vector of packages that grad depends on
+#' @param .export character vector of objects/functions that grad depends on
 #' @param \dots other arguments of the grad function
 #'
 #' @return \item{hessian}{vector containing the upper part of the information score matrix}
@@ -15,7 +16,7 @@
 #'
 #' @export
 #' 
-deriva_grad <- function(nproc=1,b,grad,.packages=NULL,...){
+deriva_grad <- function(nproc=1,b,grad,.packages=NULL,.export=NULL,...){
     m <- length(b)
     h <- sapply(b,function(x){max(1E-7,(1E-4*abs(x)))})
     if(nproc>1)
@@ -23,7 +24,8 @@ deriva_grad <- function(nproc=1,b,grad,.packages=NULL,...){
         ## derivees du gradient
         vtmp <- foreach(j=1:m,
                         .combine=rbind,
-                        .packages=.packages) %dopar%
+                        .packages=.packages,
+                        .export=.export) %dopar%
             {
                 k <- j
                 bp <- b

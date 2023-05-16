@@ -10,6 +10,7 @@
 #' of parameters over which minimization isto take place.
 #' It should return a scalar result.
 #' @param .packages character vector of packages that funcpa depends on
+#' @param .export character vector of objects/functions that funcpa depends on
 #' @param \dots other arguments of the funcpa function
 #'
 #' @return \item{v}{vector containing the upper part of the information score
@@ -25,7 +26,7 @@
 #' 
 #' @export
 #' 
-deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
+deriva <- function(nproc=1,b,funcpa,.packages=NULL,.export=NULL,...){
 
     m <- length(b)
     bh2 <- bh <- rep(0,m)
@@ -45,7 +46,8 @@ deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
             ## derivees premieres:
             ll <- foreach(k=(m*(m+1)/2)+1:m,
                           .combine=cbind,
-                          .packages=.packages) %dopar%
+                          .packages=.packages,
+                          .export=.export) %dopar%
             {
                 i <- grid[k,1]
                 
@@ -68,7 +70,8 @@ deriva <- function(nproc=1,b,funcpa,.packages=NULL,...){
             ## derivees secondes:
             v2 <- foreach(k=1:(m*(m+1)/2),
                           .combine=c,
-                          .packages=.packages) %dopar%
+                          .packages=.packages,
+                          .export=.export) %dopar%
             {
                 i <- grid[k,1]
                 j <- grid[k,2]

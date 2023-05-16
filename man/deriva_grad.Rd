@@ -4,7 +4,7 @@
 \alias{deriva_grad}
 \title{Numerical derivatives of the gradient function}
 \usage{
-deriva_grad(nproc = 1, b, grad, .packages = NULL, ...)
+deriva_grad(nproc = 1, b, grad, .packages = NULL, .export = NULL, ...)
 }
 \arguments{
 \item{nproc}{number of processors for parallel computing}
@@ -14,6 +14,8 @@ deriva_grad(nproc = 1, b, grad, .packages = NULL, ...)
 \item{grad}{the gradient of the function to be minimized (or maximized)}
 
 \item{.packages}{character vector of packages that grad depends on}
+
+\item{.export}{character vector of objects/functions that grad depends on}
 
 \item{\dots}{other arguments of the grad function}
 }

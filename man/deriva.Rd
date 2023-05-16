@@ -4,7 +4,7 @@
 \alias{deriva}
 \title{Numerical derivatives}
 \usage{
-deriva(nproc = 1, b, funcpa, .packages = NULL, ...)
+deriva(nproc = 1, b, funcpa, .packages = NULL, .export = NULL, ...)
 }
 \arguments{
 \item{nproc}{number of processors for parallel computing}
@@ -16,6 +16,8 @@ of parameters over which minimization isto take place.
 It should return a scalar result.}
 
 \item{.packages}{character vector of packages that funcpa depends on}
+
+\item{.export}{character vector of objects/functions that funcpa depends on}
 
 \item{\dots}{other arguments of the funcpa function}
 }
