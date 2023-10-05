@@ -1,4 +1,4 @@
-# <img src="man/images/mlalogo.png" align="right" width=100 style="margin-right: 0px;vertical-align:middle"/> <span style="font-size:38px"> The marqLevAlg R package </span>
+# <img src="man/images/mlalogo.png" align="right" width=130 style="margin-right: 0px;vertical-align:bottom"/> <span style="font-size:38px"> The marqLevAlg R package </span>
 
 &nbsp;
 
