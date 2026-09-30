@@ -4,7 +4,15 @@
 \alias{deriva}
 \title{Numerical derivatives}
 \usage{
-deriva(nproc = 1, b, funcpa, .packages = NULL, .export = NULL, ...)
+deriva(
+  nproc = 1,
+  b,
+  funcpa,
+  .packages = NULL,
+  .export = NULL,
+  secondOrder = TRUE,
+  ...
+)
 }
 \arguments{
 \item{nproc}{number of processors for parallel computing}
