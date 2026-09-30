@@ -22,7 +22,6 @@
 #' enough in the parameters metric (GH-1G).
 #'
 #' @name marqLevAlg-package
-#' @docType package
 #' @author Viviane Philipps, Cecile Proust-Lima, Boris Hejblum, Melanie Prague, Daniel Commenges, Amadou Diakite
 #' @references \emph{marqLevAlg Algorithm}
 #'
@@ -39,6 +38,7 @@
 #' Commenges D. Jacqmin-Gadda H. Proust C. Guedj J. A Newton-like algorithm for
 #' likelihood maximization : the robust-variance scoring algorithm
 #' arxiv:math/0610402v2 (2006)
+"_PACKAGE"
 #' @keywords marqLevAlg algorithm optimization maximisation
 #' package
 #' @importFrom parallel makeCluster stopCluster

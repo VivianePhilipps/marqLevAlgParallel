@@ -24,9 +24,9 @@
 #' @param fn the function to be optimized, with first argument the
 #' vector of parameters over which optimization is to take place (argument b).
 #' It should return a scalar result.
-#' @param gr a function to return the gradient value for a specific point.
+#' @param gr a function to return the gradient value (first order partial derivatives) for a specific point.
 #' If missing, finite-difference approximation will be used.
-#' @param hess a function to return the hessian matrix for a specific point.
+#' @param hess a function to return the hessian matrix (minus the second order partial derivatives) for a specific point.
 #' If missing, finite-difference approximation will be used.
 #' @param maxiter optional maximum number of iterations for the marqLevAlg
 #' iterative algorithm. Default is 500.
@@ -196,14 +196,15 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 
 
         if(minimize==TRUE){
-             funcpa <- function(b,...){-fn(b,...)} 
-            if(!is.null(gr)) grad <- function(b,...){-gr(b,...)}            
+            funcpa <- function(b,...){-fn(b,...)} 
+            if(!is.null(gr)) grad <- function(b,...){-gr(b,...)}  
+            if(!is.null(hess)) hessian <- function(b,...){-hess(b,...)}
         }
         else{
             funcpa <- function(b,...){fn(b,...)} 
             if(!is.null(gr)) grad <- function(b,...){gr(b,...)}
+            if(!is.null(hess)) hessian <- function(b,...){hess(b,...)}
         }
-	if(!is.null(hess)) hessian <- function(b,...){hess(b,...)}
 
 	flush.console()
 	ptm <- proc.time()
@@ -233,7 +234,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 	gonflencountmax <- 10
 
 ## old parameters iteration -1
-	old.b <- b
+	old.b <- as.numeric(b)
 	old.rl <- 0
 	old.ca <- 1
 	old.cb <- 1
@@ -242,7 +243,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 ## 	
 	repeat{	
 	
-		if (sum(!is.finite(b))>0){
+		if (sum(!is.finite(as.numeric(b)))>0){
 
                     cat("Infinite parameters...\n")
                     cat("Last step values :\n")
@@ -263,7 +264,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			deriv <- deriva(nproc,b,funcpa,.packages=.packages,.export=.export,...)
 			v <- deriv$v
 			rl <- deriv$rl
-			
 			if((multipleTry > 1) & (ni ==0)){
 				kk <- 0
 				while(((kk < multipleTry) & (!is.finite(rl)))){
@@ -273,7 +273,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 					v <- deriv$v
 					rl <- deriv$rl
 				}
-			} 
+			}
 		}else{
 			v <- NULL
 			rl=funcpa(b,...)
@@ -290,7 +290,14 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			}
 			
 		}
-		if((sum(is.finite(b))==m) && !is.finite(rl)){
+
+            matv <- matrix(0, m, m)
+            matv[upper.tri(matv, diag=TRUE)] <- v[1:nfmax]
+            matv <- t(matv)
+            matv[upper.tri(matv, diag=TRUE)] <- v[1:nfmax]
+            #print(matv)
+            #print(v[nfmax+1:m])
+		if((sum(is.finite(as.numeric(b)))==m) && !is.finite(rl)){
 			cat("Problem of computation. Verify your function specification...\n")
 			cat("Infinite value with finite parameters : b=",round(old.b,digits),"\n")
                         istop <- 4
@@ -298,7 +305,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
                         break
 		}
 
-		if(((sum(!is.finite(b)) > 0) || (sum(!is.finite(rl)) > 0)) && (ni==0)){
+		if(((sum(!is.finite(as.numeric(b))) > 0) || (sum(!is.finite(rl)) > 0)) && (ni==0)){
 			cat("Problem of computation. Verify your function specification...\n")
 			cat("Infinite value or parameters\n")
 			istop <- 4
@@ -315,7 +322,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			}
 		}
 		fu.int <- fu[1:(m*(m+1)/2)]
-	
 		dsinv <- .Fortran(C_dsinv,fu.out=as.double(fu.int),as.integer(m),as.double(ep),ier=as.integer(0),det=as.double(0))
 				
                 ier <- dsinv$ier
@@ -326,7 +332,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			dd <- ghg(m,v,fu)$ghg/m
                         if(is.na(dd)) dd <- epsd+1
 		}
-		
+##if(rl < -1000000) print(b)		
         if(print.info){
 		cat("------------------ iteration ",ni,"------------------\n",file=file,append=TRUE)
 		cat("Function value ",round(rl,digits),"\n",file=file,append=TRUE)
@@ -341,7 +347,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
                 else write.table(res.info,file=file,append=TRUE)
 		cat("\n")
 	}
-		old.b <- b
+		old.b <- as.numeric(b)
 		old.rl <- rl
 		old.ca <- ca
 		old.cb <- cb
@@ -421,7 +427,7 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 				fu[ii] <- da*ga*tr
 			}
 		}
-			
+
 		dchole <- .Fortran(C_dchole,fu=as.double(fu),as.integer(m),as.integer(nql),idpos=as.integer(0))
 		fu <- dchole$fu
 		idpos <- dchole$idpos
@@ -457,9 +463,8 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 
 		}
 		delta <- fu[(nfmax+1):(nfmax+m)]
-		b1 <- b + delta
+            b1 <- b + delta
 		rl <- funcpa(b1,...)
-		
 		if(blinding){
 			if(is.na(rl)){
 				if(minimize)  cat("rl :",-rl,"\n") else cat("rl :",rl,"\n")
@@ -478,7 +483,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			}
 		}
 		if (rl1 < rl){
-		
 			if(da < eps){
 				da <- eps
 			}else{
@@ -496,7 +500,6 @@ marqLevAlg <- function(b,m=FALSE,fn,gr=NULL,hess=NULL,maxiter=500,epsa=0.0001,ep
 			}
 		}else{
 			maxt <- max(abs(delta)) 
-	
 			if(maxt == 0){
 				vw <- th
 			}else{

@@ -63,10 +63,10 @@ parameters. Default is 0.1 for every parameter.}
 vector of parameters over which optimization is to take place (argument b).
 It should return a scalar result.}
 
-\item{gr}{a function to return the gradient value for a specific point.
+\item{gr}{a function to return the gradient value (first order partial derivatives) for a specific point.
 If missing, finite-difference approximation will be used.}
 
-\item{hess}{a function to return the hessian matrix for a specific point.
+\item{hess}{a function to return the hessian matrix (minus the second order partial derivatives) for a specific point.
 If missing, finite-difference approximation will be used.}
 
 \item{maxiter}{optional maximum number of iterations for the marqLevAlg

@@ -43,11 +43,13 @@ Commenges D. Jacqmin-Gadda H. Proust C. Guedj J. A Newton-like algorithm for
 likelihood maximization : the robust-variance scoring algorithm
 arxiv:math/0610402v2 (2006)
 }
+\seealso{
+Useful links:
+\itemize{
+  \item Report bugs at \url{https://github.com/VivianePhilipps/marqLevAlgParallel/issues}
+}
+
+}
 \author{
 Viviane Philipps, Cecile Proust-Lima, Boris Hejblum, Melanie Prague, Daniel Commenges, Amadou Diakite
 }
-\keyword{algorithm}
-\keyword{marqLevAlg}
-\keyword{maximisation}
-\keyword{optimization}
-\keyword{package}
