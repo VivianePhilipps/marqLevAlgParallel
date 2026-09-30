@@ -11,10 +11,13 @@
 #' It should return a scalar result.
 #' @param .packages character vector of packages that funcpa depends on
 #' @param .export character vector of objects/functions that funcpa depends on
+#' @param secondOrder logical indicating if second order derivatives should be
+#' computed or only first order derivatives. Default to TRUE, meaning that
+#' first and second order derivatives are returned. 
 #' @param \dots other arguments of the funcpa function
 #'
 #' @return \item{v}{vector containing the upper part of the information score
-#' matrix and the first derivatives} \item{rl}{the value of the funcpa function
+#' matrix (only if secondOrder = TRUE) and the first derivatives} \item{rl}{the value of the funcpa function
 #' at point b}
 #' @author Viviane Philipps, Boris Hejblum, Cecile Proust-Lima, Daniel Commenges
 #' @references Donald W. Marquardt An algorithm for Least-Squares Estimation of Nonlinear Parameters. Journal of the Society for Industrial and Applied Mathematics, Vol. 11, No. 2. (Jun, 1963), pp. 431-441.

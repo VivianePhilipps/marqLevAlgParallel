@@ -27,11 +27,15 @@ It should return a scalar result.}
 
 \item{.export}{character vector of objects/functions that funcpa depends on}
 
+\item{secondOrder}{logical indicating if second order derivatives should be
+computed or only first order derivatives. Default to TRUE, meaning that
+first and second order derivatives are returned.}
+
 \item{\dots}{other arguments of the funcpa function}
 }
 \value{
 \item{v}{vector containing the upper part of the information score
-matrix and the first derivatives} \item{rl}{the value of the funcpa function
+matrix (only if secondOrder = TRUE) and the first derivatives} \item{rl}{the value of the funcpa function
 at point b}
 }
 \description{

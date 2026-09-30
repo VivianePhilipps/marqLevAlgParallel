@@ -3,16 +3,17 @@ Type: Package
 Title: A Parallelized General-Purpose Optimization Based on Marquardt-Levenberg Algorithm
 Version: 2.0.8
 Date: 2023-03-22
-Author: Viviane Philipps, Cecile Proust-Lima, Melanie Prague, Boris Hejblum, Daniel Commenges, Amadou Diakite
-Maintainer: Viviane Philipps <viviane.philipps@u-bordeaux.fr>
+Authors@R: c(person("Viviane", "Philipps", role = c("aut", "cre"), email = "viviane.philipps@u-bordeaux.fr"),
+            person(given = "Cecile", family = "Proust-Lima", role = "aut"),
+            person(given = "Melanie", family = "Prague", role = "aut"),
+            person(given = "Boris", family = "Hejblum", role = "aut"),
+            person(given = "Daniel", family = "Commenges", role = "aut"),
+            person(given = "Amadou", family = "Diakite", role = "aut"))
 Depends: R (>= 3.5.0)
-Suggests: microbenchmark,knitr,rmarkdown,ggplot2,viridis,patchwork,xtable
+Suggests: microbenchmark, knitr, rmarkdown, ggplot2, viridis, patchwork, xtable
 LazyLoad: yes
 LazyData: true
-Description: This algorithm provides a numerical solution to the
-        problem of unconstrained local minimization (or maximization). It is particularly suited for complex problems and more efficient than
-        the Gauss-Newton-like algorithm when starting from points very
-        far from the final minimum (or maximum). Each iteration is parallelized and convergence relies on a stringent stopping criterion based on the first and second derivatives. See Philipps et al, 2021 <doi:10.32614/RJ-2021-089>.
+Description: This algorithm provides a numerical solution to the problem of unconstrained local minimization (or maximization). It is particularly suited for complex problems and more efficient than the Gauss-Newton-like algorithm when starting from points very far from the final minimum (or maximum). Each iteration is parallelized and convergence relies on a stringent stopping criterion based on the first and second derivatives. See Philipps et al, 2021 <doi:10.32614/RJ-2021-089>.
 License: GPL (>= 2.0)
 BugReports: https://github.com/VivianePhilipps/marqLevAlgParallel/issues
 Imports: doParallel, foreach
